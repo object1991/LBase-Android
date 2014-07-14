@@ -29,12 +29,12 @@ public class LReqEntity {
 	/**
 	 * 网络请求模式
 	 */
-	private ReqMothed mReqMode;
+	private LReqMothed mReqMode;
 
 	/**
 	 * 网络请求编码方式
 	 */
-	private ReqEncode mReqEncode;
+	private LReqEncode mReqEncode;
 
 	/**
 	 * 网络请求是否启用缓存
@@ -57,19 +57,19 @@ public class LReqEntity {
 		this.mParams = params;
 	}
 
-	public ReqMothed getReqMode() {
+	public LReqMothed getReqMode() {
 		return mReqMode;
 	}
 
-	public void setReqMode(ReqMothed mReqMode) {
+	public void setReqMode(LReqMothed mReqMode) {
 		this.mReqMode = mReqMode;
 	}
 
-	public ReqEncode getReqEncode() {
+	public LReqEncode getReqEncode() {
 		return mReqEncode;
 	}
 
-	public void setReqEncode(ReqEncode mReqEncode) {
+	public void setReqEncode(LReqEncode mReqEncode) {
 		this.mReqEncode = mReqEncode;
 	}
 
@@ -90,7 +90,7 @@ public class LReqEntity {
 	}
 
 	public LReqEntity() {
-		init(null, null, null, ReqMothed.GET, ReqEncode.UTF8, false);
+		init(null, null, null, LReqMothed.GET, LReqEncode.UTF8, false);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class LReqEntity {
 	 *            ：地址
 	 */
 	public LReqEntity(String url) {
-		init(url, null, null, ReqMothed.GET, ReqEncode.UTF8, false);
+		init(url, null, null, LReqMothed.GET, LReqEncode.UTF8, false);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class LReqEntity {
 	 *            ：参数
 	 */
 	public LReqEntity(String url, Map<String, String> params) {
-		init(url, params, null, ReqMothed.POST, ReqEncode.UTF8, false);
+		init(url, params, null, LReqMothed.POST, LReqEncode.UTF8, false);
 	}
 
 	/**
@@ -128,8 +128,8 @@ public class LReqEntity {
 	 * @param mode
 	 *            ：请求模式
 	 */
-	public LReqEntity(String url, Map<String, String> params, ReqMothed mode) {
-		init(url, params, null, mode, ReqEncode.UTF8, false);
+	public LReqEntity(String url, Map<String, String> params, LReqMothed mode) {
+		init(url, params, null, mode, LReqEncode.UTF8, false);
 	}
 
 	/**
@@ -145,8 +145,8 @@ public class LReqEntity {
 	 * @param encoding
 	 *            ：请求编码
 	 */
-	public LReqEntity(String url, Map<String, String> params, ReqMothed mode,
-			ReqEncode encoding) {
+	public LReqEntity(String url, Map<String, String> params, LReqMothed mode,
+			LReqEncode encoding) {
 		init(url, params, null, mode, encoding, false);
 	}
 
@@ -166,8 +166,8 @@ public class LReqEntity {
 	 * @param useCache
 	 *            ：启用缓存
 	 */
-	public LReqEntity(String url, Map<String, String> params, ReqMothed mode,
-			ReqEncode encoding, boolean useCache) {
+	public LReqEntity(String url, Map<String, String> params, LReqMothed mode,
+			LReqEncode encoding, boolean useCache) {
 		init(url, params, null, mode, encoding, useCache);
 	}
 
@@ -184,12 +184,12 @@ public class LReqEntity {
 	 *            ：编码
 	 */
 	public LReqEntity(String url, Map<String, String> params,
-			List<LFileEntity> list, ReqEncode encoding) {
-		init(url, params, list, ReqMothed.POST, encoding, false);
+			List<LFileEntity> list, LReqEncode encoding) {
+		init(url, params, list, LReqMothed.POST, encoding, false);
 	}
 
 	private void init(String url, Map<String, String> params,
-			List<LFileEntity> list, ReqMothed mode, ReqEncode encoding,
+			List<LFileEntity> list, LReqMothed mode, LReqEncode encoding,
 			boolean useCache) {
 		this.mUrl = url;
 		this.mParams = params;

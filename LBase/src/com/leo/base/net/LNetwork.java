@@ -162,8 +162,8 @@ public abstract class LNetwork implements ILNetwork {
 				throw new NullPointerException("请求地址参数不能为空");
 			}
 			Map<String, String> param = mReqEntity.getParams();
-			ReqEncode encoding = mReqEntity.getReqEncode();
-			ReqMothed mothed = mReqEntity.getReqMode();
+			LReqEncode encoding = mReqEntity.getReqEncode();
+			LReqMothed mothed = mReqEntity.getReqMode();
 			List<LFileEntity> files = mReqEntity.getFileParams();
 			String resStr = null;
 			try {

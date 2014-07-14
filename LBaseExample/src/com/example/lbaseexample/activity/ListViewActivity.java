@@ -14,7 +14,7 @@ import com.example.lbaseexample.handler.ListViewHandler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
 import com.leo.base.net.LReqEntity;
-import com.leo.base.net.ReqMothed;
+import com.leo.base.net.LReqMothed;
 import com.leo.base.util.T;
 
 public class ListViewActivity extends LActivity {
@@ -52,7 +52,7 @@ public class ListViewActivity extends LActivity {
 	private void sendRequest() {
 		// ... 此URL来自于网络
 		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";
-		ReqMothed mothed = ReqMothed.GET;
+		LReqMothed mothed = LReqMothed.GET;
 		LReqEntity entity = new LReqEntity();
 		entity.setUrl(url);
 		entity.setReqMode(mothed);

@@ -7,7 +7,7 @@
 	并将代码层次划分，网络请求、结果解析、结果处理等繁琐并且常用的代码变得简单使用；
 	Activity、Fragment、Adapter 只需处理 View 相关操作，Handler 处理请求数据解析等相关操作，使用者不需要再写着大量重复的代码去创建线程，只需几行便可解决；
 	常用的 BaseAdapter 也不需要再写着大量重复的代码，使用者只需要把工作重点放在 getView 上面就可以，处理好 Item 的数据，其它功能让 LBase 帮你解决
-项目结构
+项目结构：
 	com.leo.base
 		.activity
 			LActivity.java

@@ -76,9 +76,9 @@ public class LCaller {
 	 * @param useCache
 	 *            ：是否启用缓存
 	 * @param mothed
-	 *            ：请求方式{@link ReqMothed}
+	 *            ：请求方式{@link LReqMothed}
 	 * @param encoding
-	 *            ：请求编码{@link ReqEncode}
+	 *            ：请求编码{@link LReqEncode}
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 * @return：String类型请求结果
@@ -86,14 +86,14 @@ public class LCaller {
 	 * @throws IOException
 	 */
 	public static String doConn(String url, Map<String, String> params,
-			boolean useCache, ReqMothed mothed, ReqEncode encoding)
+			boolean useCache, LReqMothed mothed, LReqEncode encoding)
 			throws Exception {
 
 		if (TextUtils.isEmpty(url)) {
 			throw new NullPointerException("网络请求地址不能为空");
 		}
 		String data = null;
-		String encode = ReqEncode.UTF8.getEncode();
+		String encode = LReqEncode.UTF8.getEncode();
 		if (encoding != null) {
 			encode = encoding.getEncode();
 		}
@@ -104,9 +104,9 @@ public class LCaller {
 				data = doPost(url, params, useCache, encode);
 			}
 		} else {
-			if (mothed == ReqMothed.POST) {
+			if (mothed == LReqMothed.POST) {
 				data = doPost(url, params, useCache, encode);
-			} else if (mothed == ReqMothed.GET) {
+			} else if (mothed == LReqMothed.GET) {
 				data = doGet(url, useCache, encode);
 			} else {
 				throw new IllegalArgumentException("请求方式参数错误");
@@ -261,7 +261,7 @@ public class LCaller {
 	 */
 	public static String convertStreamToString(final InputStream stream)
 			throws Exception {
-		return convertStreamToString(stream, ReqEncode.UTF8.getEncode());
+		return convertStreamToString(stream, LReqEncode.UTF8.getEncode());
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class LCaller {
 	 * @throws IOException
 	 */
 	public static String doUploadFile(String url, Map<String, String> params,
-			List<LFileEntity> files, ReqEncode encoding) throws Exception {
+			List<LFileEntity> files, LReqEncode encoding) throws Exception {
 
 		String BOUNDARY = java.util.UUID.randomUUID().toString();
 		String PREFIX = "--", LINEND = "\r\n";
