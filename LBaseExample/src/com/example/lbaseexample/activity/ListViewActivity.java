@@ -34,6 +34,9 @@ public class ListViewActivity extends LActivity {
 		initData();
 	}
 
+	/**
+	 * 加载数据
+	 */
 	private void initData() {
 		List<ListEntity> data = DBManager.get().getListEntitys();
 		if (data != null && data.size() > 0) {
