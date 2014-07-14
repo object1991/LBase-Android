@@ -23,6 +23,11 @@
 * 第三个是读写手机状态和身份
 
 
+## 第三方开源程序的使用
+
+* [universal-image-loader-1.9.2.jar](https://github.com/nostra13/Android-Universal-Image-Loader) 由 nostra13 提供开源
+
+
 ## 使用 LBase 框架
 
 * 请下载 LBaseExample 查看
