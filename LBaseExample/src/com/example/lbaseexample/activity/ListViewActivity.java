@@ -40,11 +40,9 @@ public class ListViewActivity extends LActivity {
 			setData(data);
 		} else {
 			sendRequest();
-			this.finish();
-			return;
-//			progress = new ProgressDialog(this);
-//			progress.setMessage("正在加载数据...");
-//			progress.show();
+			progress = new ProgressDialog(this);
+			progress.setMessage("正在加载数据...");
+			progress.show();
 		}
 	}
 
