@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LBaseExample</string>
+    <string name="app_service_url">http://127.0.0.1/</string>
+    <string name="app_listview">ListViewExample</string>
+    <string name="app_about">About Me</string>
+    <string name="app_fragmentviewpager">FragmentViewPagerExample</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

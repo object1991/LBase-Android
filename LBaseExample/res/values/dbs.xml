@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- 创建数据库表集合 -->
+    <string-array name="create_tables">
+        <item>CREATE TABLE if not exists ListEntityTable(
+			  ID INTEGER,
+		      URL VARCHAR(30),
+		      CONTENT VARCHAR(100)
+		      )</item>
+    </string-array>
+
+    <!-- 删除数据库表集合 -->
+    <string-array name="drop_tables">
+        <item>drop table if exists ListEntityTable;</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,57 @@
+项目名称：LBase
+项目类型：Library
+项目所有人：陈磊(Chen Lei) 
+项目简介：
+	项目集合了开发中经常使用的工具类，并简化代码；
+	如：T类（Toast）、L类（Log）、LSharePreference类（SharedPreferences） 等；
+	并将代码层次划分，网络请求、结果解析、结果处理等繁琐并且常用的代码变得简单使用；
+	Activity、Fragment、Adapter 只需处理 View 相关操作，Handler 处理请求数据解析等相关操作，使用者不需要再写着大量重复的代码去创建线程，只需几行便可解决；
+	常用的 BaseAdapter 也不需要再写着大量重复的代码，使用者只需要把工作重点放在 getView 上面就可以，处理好 Item 的数据，其它功能让 LBase 帮你解决
+项目结构
+	com.leo.base
+		.activity
+			LActivity.java
+			.fragment
+				LFragment.java
+		.adapter
+			LAdapters.java
+			LBaseAdapter.java
+			LPagerAdapter.java
+		.application
+			LApplication.java
+			LConfig.java
+		.cache
+			LCache.java
+		.db
+			LDBHelper.java
+			LDBManager.java
+		.entity
+			LMessage.java
+		.exception
+			ILException.java
+			ILException.java
+			LLoginException.java
+		.handler
+			LHandler.java
+		.listener
+			LViewPagerChangeListener.java
+		.net
+			ILNetwork.java
+			ILNetworkCallback.java
+			LCaller.java
+			LFileEntity.java
+			LFileType.java
+			LNetwork.java
+			LReqEntity.java
+			ReqEncode.java
+			ReqMothed.java
+		.util
+			L.java
+			LBitmap.java
+			LDate.java
+			LDiscConn.java
+			LFormat.java
+			LMobileInfo.java
+			LSharePreference.java
+			MD5.java
+			T.java
