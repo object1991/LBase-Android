@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.leo.base.cache.LCache;
 import com.leo.base.entity.LMessage;
-import com.leo.base.handler.LHandler.OnLHandlerCallback;
+import com.leo.base.handler.ILHandlerCallback;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -39,7 +39,7 @@ import android.widget.BaseAdapter;
  * @param <T>
  *            传入此参数类型，以保证返回的数据为使用者需要的类型
  */
-public abstract class LBaseAdapter<T> extends BaseAdapter implements OnLHandlerCallback {
+public abstract class LBaseAdapter<T> extends BaseAdapter implements ILHandlerCallback {
 
 	/**
 	 * 缓存View对象
@@ -49,6 +49,11 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements OnLHandlerC
 	private LAdapters<T> mAdapter;
 
 	private LayoutInflater mInflater;
+
+	/**
+	 * 获取LBaseAdapter是否已经销毁
+	 */
+	private boolean isDestroy;
 
 	/**
 	 * 构造函数
@@ -169,6 +174,7 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements OnLHandlerC
 	 * 清除内存数据，并不刷新UI
 	 */
 	public void Destroy() {
+		isDestroy = true;
 		destroyConvertView();
 		cacheView = null;
 		if (mAdapter != null) {
@@ -245,6 +251,15 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements OnLHandlerC
 	 */
 	public void onResultHandler(LMessage msg, int requestId) {
 		// ... 写入你需要的代码
+	}
+
+	/**
+	 * 
+	 * @return 获取LBaseAdapter是否已经销毁
+	 */
+	@Override
+	public boolean isDestroy() {
+		return isDestroy;
 	}
 
 }

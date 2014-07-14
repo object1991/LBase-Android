@@ -15,7 +15,7 @@ public class FragmentHandler extends MHandler {
 	}
 
 	@Override
-	public LMessage onNetResult(String strs, int requestId)
+	public LMessage onNetParse(String strs, int requestId)
 			throws JSONException, LLoginException {
 		LMessage msg = new LMessage();
 		msg.setStr(strs);

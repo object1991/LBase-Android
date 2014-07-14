@@ -1,5 +1,7 @@
 package com.leo.base.handler;
 
+import org.json.JSONException;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,7 +10,11 @@ import com.leo.base.activity.LActivity;
 import com.leo.base.activity.fragment.LFragment;
 import com.leo.base.adapter.LBaseAdapter;
 import com.leo.base.entity.LMessage;
+import com.leo.base.exception.LLoginException;
+import com.leo.base.net.ILNetworkCallback;
 import com.leo.base.net.LReqEntity;
+import com.leo.base.net.ILNetwork.LReqResultState;
+import com.leo.base.util.L;
 
 /**
  * 
@@ -16,7 +22,7 @@ import com.leo.base.net.LReqEntity;
  * @version 1.1.5
  * 
  */
-public abstract class LHandler extends Handler {
+public abstract class LHandler extends Handler implements ILNetworkCallback {
 
 	/**
 	 * 默认进动画
@@ -61,30 +67,47 @@ public abstract class LHandler extends Handler {
 	public LHandler(LActivity activity) {
 		this.mActivity = activity;
 		try {
-			this.mOnLHandlerCallback = (OnLHandlerCallback) activity;
+			this.mILHandlerCallback = (ILHandlerCallback) activity;
 		} catch (ClassCastException e) {
-			this.mOnLHandlerCallback = null;
+			this.mILHandlerCallback = null;
 		}
 	}
 
+	/**
+	 * 构造函数
+	 * 
+	 * @param fragment
+	 */
 	public LHandler(LFragment fragment) {
 		this.mFragment = fragment;
 		try {
-			this.mOnLHandlerCallback = (OnLHandlerCallback) mFragment;
+			this.mILHandlerCallback = (ILHandlerCallback) mFragment;
 		} catch (ClassCastException e) {
-			this.mOnLHandlerCallback = null;
+			this.mILHandlerCallback = null;
 		}
 	}
 
+	/**
+	 * 构造函数
+	 * 
+	 * @param <T>
+	 * @param mBaseAdapter
+	 */
 	public <T> LHandler(LBaseAdapter<T> mBaseAdapter) {
 		this.mBaseAdapter = mBaseAdapter;
 		try {
-			this.mOnLHandlerCallback = (OnLHandlerCallback) mBaseAdapter;
+			this.mILHandlerCallback = (ILHandlerCallback) mBaseAdapter;
 		} catch (ClassCastException e) {
-			this.mOnLHandlerCallback = null;
+			this.mILHandlerCallback = null;
 		}
 	}
 
+	/**
+	 * 开始请求网络连接
+	 * 
+	 * @param entity
+	 *            ：网络请求所需要的参数对象
+	 */
 	public void startLoadingData(LReqEntity entity) {
 		startLoadingData(entity, 0);
 	}
@@ -95,9 +118,98 @@ public abstract class LHandler extends Handler {
 	 * @param entity
 	 *            ：网络请求所需要的参数对象
 	 * @param requestId
-	 * 			  : 请求ID，方便区分不同请求
+	 *            : 请求ID，方便区分不同请求
 	 */
 	public abstract void startLoadingData(LReqEntity entity, int requestId);
+
+	/**
+	 * 请求发现异常<br/>
+	 * 如果请求view已经销毁，则返回
+	 */
+	@Override
+	public void onNetException(LReqResultState state, int requestId) {
+		if (isDestroyView()) {
+			L.i("onNetException停止");
+			return;
+		}
+		L.i("onNetException运行");
+		onException(state, requestId);
+	}
+
+	/**
+	 * 网络请求异常
+	 * 
+	 * @param state
+	 *            ：异常状态
+	 * @param requestId
+	 *            ：请求ID
+	 */
+	public abstract void onException(LReqResultState state, int requestId);
+
+	/**
+	 * 请求结果返回<br/>
+	 * 如果请求view已经销毁，则返回
+	 */
+	@Override
+	public LMessage onNetResult(String strs, int requestId)
+			throws JSONException, LLoginException, Exception {
+		if (isDestroyView()) {
+			L.i("onNetResult停止");
+			return null;
+		}
+		L.i("onNetResult正常运行");
+		return onNetParse(strs, requestId);
+	}
+
+	/**
+	 * 网络请求结果返回，在此处解析返回结果
+	 * 
+	 * @param result
+	 *            ：请求返回的值
+	 * @param requestId
+	 *            ：请求ID
+	 * @return：将解析好的数据存放到LMessage中封装
+	 * @throws JSONException
+	 *             ：如解析错误，向上抛出此异常
+	 * @throws LLoginException
+	 *             ：如发现用户在后台未登录，向上抛出此异常
+	 * @throws Exception
+	 *             ：其它异常
+	 */
+	public abstract LMessage onNetParse(String result, int requestId)
+			throws JSONException, LLoginException, Exception;
+
+	/**
+	 * 返回请求解析的结果<br/>
+	 * 自动调用发出请求view的onResultHandler方法，使用者请自主复写此方法，以便处理<br/>
+	 * 如果请求view已经销毁，则返回
+	 */
+	@Override
+	public void onHandleUI(LMessage result, int requestId) {
+		if (isDestroyView()) {
+			L.i("onHandleUI停止");
+			return;
+		}
+		L.i("onHandleUI正常运行");
+		ILHandlerCallback callback = getCallback();
+		if (callback != null) {
+			callback.onResultHandler(result, requestId);
+		}
+	}
+
+	/**
+	 * 获取是否已经销毁当前view<br/>
+	 * 如果当前view并未继承ILHandlerCallback，则返回false
+	 * 
+	 * @return
+	 */
+	public boolean isDestroyView() {
+		ILHandlerCallback callback = getCallback();
+		if (callback == null) {
+			return false;
+		}
+		return callback.isDestroy();
+	}
 
 	/**
 	 * 注销当前Activity
@@ -194,18 +306,14 @@ public abstract class LHandler extends Handler {
 		context.overridePendingTransition(enterAnim, exitAnim);
 	}
 
-	private OnLHandlerCallback mOnLHandlerCallback;
+	private ILHandlerCallback mILHandlerCallback;
 
-	public void setOnLHandlerCallback(OnLHandlerCallback calback) {
-		this.mOnLHandlerCallback = calback;
+	public void setILHandlerCallback(ILHandlerCallback calback) {
+		this.mILHandlerCallback = calback;
 	}
 
-	public OnLHandlerCallback getCallback() {
-		return mOnLHandlerCallback;
-	}
-
-	public interface OnLHandlerCallback {
-		void onResultHandler(LMessage msg, int requestId);
+	public ILHandlerCallback getCallback() {
+		return mILHandlerCallback;
 	}
 
 }

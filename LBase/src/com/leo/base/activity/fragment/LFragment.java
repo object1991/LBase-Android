@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
-import com.leo.base.handler.LHandler.OnLHandlerCallback;
+import com.leo.base.handler.ILHandlerCallback;
 
 /**
  * <h1>来源：</h1> 
@@ -25,15 +25,26 @@ import com.leo.base.handler.LHandler.OnLHandlerCallback;
  * @version 1.1.5
  * 
  */
-public abstract class LFragment extends Fragment implements OnLHandlerCallback {
+public abstract class LFragment extends Fragment implements ILHandlerCallback {
 
 	protected LActivity mActivity;
 	protected View mView;
+
+	/**
+	 * 获取LFragment是否已经销毁
+	 */
+	private boolean isDestroy;
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		this.mActivity = (LActivity) activity;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		isDestroy = true;
 	}
 
 	/**
@@ -49,4 +60,14 @@ public abstract class LFragment extends Fragment implements OnLHandlerCallback {
 	public void onResultHandler(LMessage msg, int requestId) {
 		// ... 写入你需要的代码
 	}
+
+	/**
+	 * 
+	 * @return 获取LFragment是否已经销毁
+	 */
+	@Override
+	public boolean isDestroy() {
+		return isDestroy;
+	}
+
 }

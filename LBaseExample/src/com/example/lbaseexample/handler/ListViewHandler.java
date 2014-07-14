@@ -22,7 +22,7 @@ public class ListViewHandler extends MHandler {
 	}
 
 	@Override
-	public LMessage onNetResult(String strs, int requestId)
+	public LMessage onNetParse(String strs, int requestId)
 			throws JSONException, LLoginException {
 		LMessage msg = parseJson(strs);
 		if (msg.getWhat() == 1) {

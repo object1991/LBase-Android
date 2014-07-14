@@ -9,12 +9,11 @@ import com.leo.base.entity.LMessage;
 import com.leo.base.exception.LLoginException;
 import com.leo.base.handler.LHandler;
 import com.leo.base.net.ILNetwork.LReqResultState;
-import com.leo.base.net.ILNetworkCallback;
 import com.leo.base.net.LNetwork;
 import com.leo.base.net.LReqEntity;
 import com.leo.base.util.L;
 
-public abstract class MHandler extends LHandler implements ILNetworkCallback {
+public abstract class MHandler extends LHandler {
 
 	public MHandler(LActivity activity) {
 		super(activity);
@@ -29,7 +28,7 @@ public abstract class MHandler extends LHandler implements ILNetworkCallback {
 	}
 
 	@Override
-	public void onNetException(LReqResultState state, int requestId) {
+	public void onException(LReqResultState state, int requestId) {
 		switch (state) {
 		case NETWORK_EXC:
 			// ... 网络请求失败
@@ -61,16 +60,8 @@ public abstract class MHandler extends LHandler implements ILNetworkCallback {
 	}
 
 	@Override
-	public abstract LMessage onNetResult(String strs, int requestId)
+	public abstract LMessage onNetParse(String result, int requestId)
 			throws JSONException, LLoginException;
-
-	@Override
-	public void onHandleUI(LMessage result, int requestId) {
-		OnLHandlerCallback callback = getCallback();
-		if (callback != null) {
-			callback.onResultHandler(result, requestId);
-		}
-	}
 
 	@Override
 	public void startLoadingData(LReqEntity entity, int requestId) {
