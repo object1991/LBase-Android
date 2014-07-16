@@ -1,5 +1,8 @@
 package com.leo.base.db;
 
+import com.leo.base.exception.LException;
+import com.leo.base.util.L;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
@@ -181,7 +184,7 @@ public final class LDBHelper extends SQLiteOpenHelper {
 			}
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		} finally {
 			db.endTransaction();
 		}
@@ -201,7 +204,7 @@ public final class LDBHelper extends SQLiteOpenHelper {
 			}
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		} finally {
 			db.endTransaction();
 		}

@@ -6,6 +6,7 @@ package com.leo.base.exception;
  *
  */
 import com.leo.base.application.LApplication;
+import com.leo.base.util.L;
 
 public abstract class LException extends Exception implements ILException {
 
@@ -16,7 +17,7 @@ public abstract class LException extends Exception implements ILException {
 
 	public void printException(Exception e) {
 		if (LApplication.getInstance().getIsOpenDebugMode()) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		}
 	}
 
@@ -32,5 +33,17 @@ public abstract class LException extends Exception implements ILException {
 
 	@Override
 	public abstract void handleAccomplish(LExcState state);
+	
+	public static String getStackMsg(Throwable e) {
+
+		StringBuffer sb = new StringBuffer();
+		StackTraceElement[] stackArray = e.getStackTrace();
+		for (int i = 0; i < stackArray.length; i++) {
+			StackTraceElement element = stackArray[i];
+			sb.append(element.toString() + "\n");
+		}
+		sb.append(e);
+		return sb.toString();
+	}
 
 }

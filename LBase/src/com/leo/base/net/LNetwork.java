@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.leo.base.entity.LMessage;
+import com.leo.base.exception.LException;
 import com.leo.base.exception.LLoginException;
 import com.leo.base.util.L;
 
@@ -146,35 +147,39 @@ public abstract class LNetwork implements ILNetwork {
 			throw new NullPointerException("参数对象不能为空");
 		}
 		mThreadState = ReqState.RUNNING;
-		new NetworkTask().execute();
+		new NetworkTask().execute(mReqEntity);
 	}
 
 	private final class NetworkTask extends
-			AsyncTask<Void, Void, LReqResultState> {
+			AsyncTask<LReqEntity, Void, LReqResultState> {
 
 		@Override
-		protected LReqResultState doInBackground(Void... params) {
-			if (mReqEntity == null) {
+		protected LReqResultState doInBackground(LReqEntity... params) {
+			LReqEntity reqEntity = null;
+			if (params != null && params.length > 0) {
+				reqEntity = params[0];
+			}
+			if (reqEntity == null) {
 				throw new NullPointerException("参数对象不能为空");
 			}
-			String url = mReqEntity.getUrl();
+			String url = reqEntity.getUrl();
 			if (TextUtils.isEmpty(url)) {
 				throw new NullPointerException("请求地址参数不能为空");
 			}
-			Map<String, String> param = mReqEntity.getParams();
-			LReqEncode encoding = mReqEntity.getReqEncode();
-			LReqMothed mothed = mReqEntity.getReqMode();
-			List<LFileEntity> files = mReqEntity.getFileParams();
+			Map<String, String> param = reqEntity.getParams();
+			LReqEncode encoding = reqEntity.getReqEncode();
+			LReqMothed mothed = reqEntity.getReqMode();
+			List<LFileEntity> files = reqEntity.getFileParams();
 			String resStr = null;
 			try {
-				if (files != null && files.size() > 0) {
+				if (files != null && files.isEmpty()) {
 					resStr = LCaller.doUploadFile(url, param, files, encoding);
 				} else {
 					resStr = LCaller.doConn(url, param,
-							mReqEntity.getUseCache(), mothed, encoding);
+							reqEntity.getUseCache(), mothed, encoding);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				L.e(LException.getStackMsg(e));
 				return LReqResultState.NETWORK_EXC;
 			}
 			if (mCallback != null) {
@@ -195,11 +200,11 @@ public abstract class LNetwork implements ILNetwork {
 					}
 				} catch (JSONException e) {
 					mMessage = null;
-					e.printStackTrace();
+					L.e(LException.getStackMsg(e));
 					return LReqResultState.PARSE_EXC;
 				} catch (Exception e) {
 					mMessage = null;
-					e.printStackTrace();
+					L.e(LException.getStackMsg(e));
 					return LReqResultState.OTHER;
 				}
 			}
@@ -236,7 +241,7 @@ public abstract class LNetwork implements ILNetwork {
 							mRequestId);
 					break;
 				case LOGIN_EXC:
-					throw new RuntimeException("用户未登录");
+					throw new RuntimeException("用户登录返回异常");
 				case OTHER:
 					mCallback.onNetException(LReqResultState.OTHER, mRequestId);
 					break;

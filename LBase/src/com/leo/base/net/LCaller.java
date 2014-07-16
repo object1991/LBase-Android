@@ -35,6 +35,8 @@ import android.text.TextUtils;
 import com.leo.base.application.LApplication;
 import com.leo.base.application.LConfig;
 import com.leo.base.cache.LCache;
+import com.leo.base.exception.LException;
+import com.leo.base.util.L;
 import com.leo.base.util.LFormat;
 import com.leo.base.util.MD5;
 
@@ -42,7 +44,7 @@ import com.leo.base.util.MD5;
  * 
  * @author Chen Lei
  * @version 1.1.5
- *
+ * 
  */
 public class LCaller {
 	private static LCache<String> cache = null;
@@ -61,8 +63,7 @@ public class LCaller {
 		BasicHttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams,
 				LConfig.REQUEST_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpParams,
-				LConfig.SO_TIMEOUT);
+		HttpConnectionParams.setSoTimeout(httpParams, LConfig.SO_TIMEOUT);
 		return httpParams;
 	}
 
@@ -338,21 +339,21 @@ public class LCaller {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		} finally {
 			try {
 				if (inputStream != null)
 					inputStream.close();
 				inputStream = null;
 			} catch (Exception e2) {
-				e2.printStackTrace();
+				L.e(LException.getStackMsg(e2));
 			}
 			try {
 				if (outStream != null)
 					outStream.close();
 				outStream = null;
 			} catch (Exception e2) {
-				e2.printStackTrace();
+				L.e(LException.getStackMsg(e2));
 			}
 		}
 		return localFile.exists() ? true : false;

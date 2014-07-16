@@ -2,6 +2,8 @@ package com.leo.base.util;
 
 import java.security.MessageDigest;
 
+import com.leo.base.exception.LException;
+
 
 /**
  * 
@@ -20,7 +22,7 @@ public final class MD5 {
 			digest.update(content.getBytes());
 			return getHasnString(digest);
 		} catch (Exception e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		}
 		return null;
 	}

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.leo.base.application.LApplication;
+import com.leo.base.exception.LException;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -126,9 +127,9 @@ public class LBitmap {
 			outStream.flush();
 			outStream.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		} catch (IOException e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		}
 		return file.getPath();
 	}
@@ -197,7 +198,7 @@ public class LBitmap {
 		try {
 			bitmap = BitmapFactory.decodeFile(imagePath, options);
 		} catch (Exception e) {
-			e.printStackTrace();
+			L.e(LException.getStackMsg(e));
 		}
 		return bitmap;
 	}
