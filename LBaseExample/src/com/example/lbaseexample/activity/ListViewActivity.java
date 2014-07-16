@@ -1,6 +1,8 @@
 package com.example.lbaseexample.activity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import com.example.lbaseexample.entity.ListEntity;
 import com.example.lbaseexample.handler.ListViewHandler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
+import com.leo.base.net.LReqEncode;
 import com.leo.base.net.LReqEntity;
 import com.leo.base.net.LReqMothed;
 import com.leo.base.util.T;
@@ -53,9 +56,16 @@ public class ListViewActivity extends LActivity {
 	 * 请求网络，当请求成功后，框架会调用resultHandler方法，
 	 */
 	private void sendRequest() {
-		// ... 此URL来自于网络
-		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";
+		// ... 网络请求地址，此URL来自于网络
+		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";	
+		// ... 网络请求参数，默认为空
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("key", "value");	
+		// ... 网络请求编码方式，默认为UTF-8
+		LReqEncode encode = LReqEncode.UTF8;
+		// ... 网络请求方式，默认为Get，当请求参数不为空时，默认为Post
 		LReqMothed mothed = LReqMothed.GET;
+		
 		LReqEntity entity = new LReqEntity();
 		entity.setUrl(url);
 		entity.setReqMode(mothed);
