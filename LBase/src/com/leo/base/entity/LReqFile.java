@@ -1,20 +1,20 @@
-package com.leo.base.net;
+package com.leo.base.entity;
 
 import java.io.File;
 
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  *
  */
-public class LFileEntity {
+public class LReqFile {
 
 	private String name;
 	private File file;
-	private LFileType type;
+	private LReqFileType type;
 
-	public LFileEntity(String name, File file, LFileType type) {
+	public LReqFile(String name, File file, LReqFileType type) {
 		this.name = name;
 		this.file = file;
 		this.type = type;
@@ -36,11 +36,11 @@ public class LFileEntity {
 		this.file = file;
 	}
 
-	public LFileType getType() {
+	public LReqFileType getType() {
 		return type;
 	}
 
-	public void setType(LFileType type) {
+	public void setType(LReqFileType type) {
 		this.type = type;
 	}
 

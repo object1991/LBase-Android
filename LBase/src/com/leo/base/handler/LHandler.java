@@ -1,7 +1,5 @@
 package com.leo.base.handler;
 
-import org.json.JSONException;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,16 +8,14 @@ import com.leo.base.activity.LActivity;
 import com.leo.base.activity.fragment.LFragment;
 import com.leo.base.adapter.LBaseAdapter;
 import com.leo.base.entity.LMessage;
-import com.leo.base.exception.LLoginException;
+import com.leo.base.entity.LReqEntity;
+import com.leo.base.net.ILNetwork;
 import com.leo.base.net.ILNetworkCallback;
-import com.leo.base.net.LReqEntity;
-import com.leo.base.net.ILNetwork.LReqResultState;
-import com.leo.base.util.L;
 
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * 
  */
 public abstract class LHandler extends Handler implements ILNetworkCallback {
@@ -58,6 +54,16 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * 当前BaseAdapter对象
 	 */
 	private LBaseAdapter<?> mBaseAdapter;
+
+	/**
+	 * 设置LNetwork监听
+	 */
+	private ILNetwork mNetworkListener;
+
+	/**
+	 * 返回结果回调接口，用于通知所对应的LActivity、LFragment、或LBaseAdapter
+	 */
+	private ILHandlerCallback mILHandlerCallback;
 
 	/**
 	 * 构造函数
@@ -103,13 +109,40 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	}
 
 	/**
+	 * 设置网络请求监听
+	 * 
+	 * @param network
+	 */
+	public void setILNetworkListener(ILNetwork network) {
+		mNetworkListener = network;
+	}
+
+	/**
+	 * 设置返回结果回调接口，用于通知所对应的LActivity、LFragment、或LBaseAdapter
+	 * 
+	 * @param calback
+	 */
+	public void setILHandlerCallback(ILHandlerCallback calback) {
+		this.mILHandlerCallback = calback;
+	}
+
+	/**
+	 * 获取返回结果回调接口
+	 * 
+	 * @return
+	 */
+	public ILHandlerCallback getCallback() {
+		return mILHandlerCallback;
+	}
+
+	/**
 	 * 开始请求网络连接
 	 * 
 	 * @param entity
 	 *            ：网络请求所需要的参数对象
 	 */
-	public void startLoadingData(LReqEntity entity) {
-		startLoadingData(entity, 0);
+	public void start(LReqEntity entity) {
+		start(entity, 0);
 	}
 
 	/**
@@ -120,95 +153,51 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * @param requestId
 	 *            : 请求ID，方便区分不同请求
 	 */
-	public abstract void startLoadingData(LReqEntity entity, int requestId);
-
-	/**
-	 * 请求发现异常<br/>
-	 * 如果请求view已经销毁，则返回
-	 */
-	@Override
-	public void onNetException(LReqResultState state, int requestId) {
-		if (isDestroyView()) {
-			L.i("onNetException停止");
-			return;
+	public void start(LReqEntity entity, int requestId) {
+		if (mNetworkListener != null) {
+			mNetworkListener.start(entity, requestId, this);
+		} else {
+			throw new NullPointerException(
+					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
 		}
-		L.i("onNetException运行");
-		onException(state, requestId);
 	}
 
 	/**
-	 * 网络请求异常
-	 * 
-	 * @param state
-	 *            ：异常状态
-	 * @param requestId
-	 *            ：请求ID
+	 * 停止当前实体所有线程
 	 */
-	public abstract void onException(LReqResultState state, int requestId);
-
-	/**
-	 * 请求结果返回<br/>
-	 * 如果请求view已经销毁，则返回
-	 */
-	@Override
-	public LMessage onNetResult(String strs, int requestId)
-			throws JSONException, LLoginException, Exception {
-		if (isDestroyView()) {
-			L.i("onNetResult停止");
-			return null;
+	public void stopAllThread() {
+		if (mNetworkListener != null) {
+			mNetworkListener.stopAllThread();
+		} else {
+			throw new NullPointerException(
+					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
 		}
-		L.i("onNetResult正常运行");
-		return onNetParse(strs, requestId);
 	}
 
 	/**
-	 * 网络请求结果返回，在此处解析返回结果
+	 * 停止当前实体requestId所对应的线程
 	 * 
-	 * @param result
-	 *            ：请求返回的值
 	 * @param requestId
-	 *            ：请求ID
-	 * @return：将解析好的数据存放到LMessage中封装
-	 * @throws JSONException
-	 *             ：如解析错误，向上抛出此异常
-	 * @throws LLoginException
-	 *             ：如发现用户在后台未登录，向上抛出此异常
-	 * @throws Exception
-	 *             ：其它异常
 	 */
-	public abstract LMessage onNetParse(String result, int requestId)
-			throws JSONException, LLoginException, Exception;
+	public void stopThread(int requestId) {
+		if (mNetworkListener != null) {
+			mNetworkListener.stopThread(requestId);
+		} else {
+			throw new NullPointerException(
+					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
+		}
+	}
 
 	/**
 	 * 返回请求解析的结果<br/>
 	 * 自动调用发出请求view的onResultHandler方法，使用者请自主复写此方法，以便处理<br/>
-	 * 如果请求view已经销毁，则返回
 	 */
 	@Override
-	public void onHandleUI(LMessage result, int requestId) {
-		if (isDestroyView()) {
-			L.i("onHandleUI停止");
-			return;
-		}
-		L.i("onHandleUI正常运行");
+	public void onHandlerUI(LMessage result, int requestId) {
 		ILHandlerCallback callback = getCallback();
 		if (callback != null) {
 			callback.onResultHandler(result, requestId);
 		}
-	}
-
-	/**
-	 * 获取是否已经销毁当前view<br/>
-	 * 如果当前view并未继承ILHandlerCallback，则返回false
-	 * 
-	 * @return
-	 */
-	public boolean isDestroyView() {
-		ILHandlerCallback callback = getCallback();
-		if (callback == null) {
-			return false;
-		}
-		return callback.isDestroy();
 	}
 
 	/**
@@ -304,16 +293,6 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 		}
 		// API LEVEL5.0
 		context.overridePendingTransition(enterAnim, exitAnim);
-	}
-
-	private ILHandlerCallback mILHandlerCallback;
-
-	public void setILHandlerCallback(ILHandlerCallback calback) {
-		this.mILHandlerCallback = calback;
-	}
-
-	public ILHandlerCallback getCallback() {
-		return mILHandlerCallback;
 	}
 
 }

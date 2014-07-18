@@ -5,6 +5,7 @@
     <string name="app_service_url">http://127.0.0.1/</string>
     <string name="app_listview">ListViewExample</string>
     <string name="app_about">About Me</string>
+    <string name="app_many_request">多个请求并发</string>
     <string name="app_fragmentviewpager">FragmentViewPagerExample</string>
     <string name="action_settings">Settings</string>
 

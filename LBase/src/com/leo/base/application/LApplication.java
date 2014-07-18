@@ -52,7 +52,7 @@ import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
  * String 服务器后台 SESSION 的 VALUE 值，该值在网络请求时将自动填充</li> <li>int 屏幕宽度和高度，单位（px）</li>
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * 
  */
 public class LApplication extends Application {
@@ -205,6 +205,16 @@ public class LApplication extends Application {
 			activityList = new LinkedList<FragmentActivity>();
 		}
 		this.activityList.add(activity);
+	}
+
+	/**
+	 * 删除一个Activity在数组里
+	 * @param activity
+	 */
+	public void delActivity(FragmentActivity activity) {
+		if (activityList != null) {
+			activityList.remove(activity);
+		}
 	}
 
 	/**

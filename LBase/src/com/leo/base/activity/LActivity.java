@@ -20,7 +20,7 @@ import com.leo.base.handler.ILHandlerCallback;
  * {@linkplain android.app.Activity#onCreate(Bundle savedInstanceState)
  * onCreate} 方法使用相同， 抽象出此方法是为了方便使用者继承之后，不需要再手动 Override</li> <li>
  * 当你使用了
- * {@linkplain com.leo.base.handler.LHandler#startLoadingData(com.leo.base.net.LReqEntity)
+ * {@linkplain com.leo.base.handler.LHandler#startLoadingData(com.leo.base.entity.LReqEntity)
  * LHandler.startLoadingData(LReqEntity)} 方法请求网络后，
  * {@linkplain com.leo.base.handler.LHandler LHandler} 会自动调用此类的
  * {@linkplain com.leo.base.activity.LActivity#resultHandler(com.leo.base.entity.LMessage)
@@ -28,7 +28,7 @@ import com.leo.base.handler.ILHandlerCallback;
  * {@linkplain com.leo.base.entity.LMessage LMessage} 对象传回</li>
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * 
  */
 public abstract class LActivity extends FragmentActivity implements
@@ -44,16 +44,10 @@ public abstract class LActivity extends FragmentActivity implements
 	 */
 	public LApplication mLApplication;
 
-	/**
-	 * 获取LActivity是否已经销毁
-	 */
-	private boolean isDestroy;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// requestWindowFeature(Window.FEATURE_NO_TITLE);
-		isDestroy = false;
 		mContext = this;
 		mLApplication = LApplication.getInstance();
 		mLApplication.setContext(mContext);
@@ -75,8 +69,8 @@ public abstract class LActivity extends FragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
+		mLApplication.delActivity(this);
 		super.onDestroy();
-		isDestroy = true;
 	}
 
 	/**
@@ -102,15 +96,6 @@ public abstract class LActivity extends FragmentActivity implements
 	@Override
 	public void onResultHandler(LMessage msg, int requestId) {
 		// ... 写入你需要的代码
-	}
-
-	/**
-	 * 
-	 * @return 获取LActivity是否已经销毁
-	 */
-	@Override
-	public boolean isDestroy() {
-		return isDestroy;
 	}
 
 }

@@ -1,13 +1,15 @@
 package com.leo.base.exception;
 
-/**
- * 此类暂未正式使用
- * @author Chen Lei
- *
- */
 import com.leo.base.application.LApplication;
 import com.leo.base.util.L;
 
+/**
+ * 此类暂未正式使用
+ * 
+ * @author Chen Lei
+ * @version 1.3.1
+ * 
+ */
 public abstract class LException extends Exception implements ILException {
 
 	/**
@@ -33,9 +35,13 @@ public abstract class LException extends Exception implements ILException {
 
 	@Override
 	public abstract void handleAccomplish(LExcState state);
-	
-	public static String getStackMsg(Throwable e) {
 
+	/**
+	 * 获取基本异常信息
+	 * @param e
+	 * @return
+	 */
+	public static String getStackMsg(Throwable e) {
 		StringBuffer sb = new StringBuffer();
 		StackTraceElement[] stackArray = e.getStackTrace();
 		for (int i = 0; i < stackArray.length; i++) {

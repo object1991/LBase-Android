@@ -27,7 +27,7 @@ import android.widget.BaseAdapter;
  * {@linkplain android.widget.BaseAdapter#getView(int, View, ViewGroup)
  * BaseAdapter.getView(int, View, ViewGroup)} 方法便可，无需考虑其它<br/>
  * 此类还提供了多个操作缓存的方法</li> <li>当你使用了
- * {@linkplain com.leo.base.handler.LHandler#startLoadingData(com.leo.base.net.LReqEntity)
+ * {@linkplain com.leo.base.handler.LHandler#startLoadingData(com.leo.base.entity.LReqEntity)
  * LHandler.startLoadingData(LReqEntity)} 方法请求网络后，
  * {@linkplain com.leo.base.handler.LHandler LHandler} 会自动调用此类的
  * {@linkplain com.leo.base.adapter.LBaseAdapter#resultHandler(com.leo.base.entity.LMessage)
@@ -35,7 +35,7 @@ import android.widget.BaseAdapter;
  * {@linkplain com.leo.base.entity.LMessage LMessage} 对象传回</li>
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * @param <T>
  *            传入此参数类型，以保证返回的数据为使用者需要的类型
  */
@@ -49,11 +49,6 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements ILHandlerCa
 	private LAdapters<T> mAdapter;
 
 	private LayoutInflater mInflater;
-
-	/**
-	 * 获取LBaseAdapter是否已经销毁
-	 */
-	private boolean isDestroy;
 
 	/**
 	 * 构造函数
@@ -174,7 +169,6 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements ILHandlerCa
 	 * 清除内存数据，并不刷新UI
 	 */
 	public void Destroy() {
-		isDestroy = true;
 		destroyConvertView();
 		cacheView = null;
 		if (mAdapter != null) {
@@ -251,15 +245,6 @@ public abstract class LBaseAdapter<T> extends BaseAdapter implements ILHandlerCa
 	 */
 	public void onResultHandler(LMessage msg, int requestId) {
 		// ... 写入你需要的代码
-	}
-
-	/**
-	 * 
-	 * @return 获取LBaseAdapter是否已经销毁
-	 */
-	@Override
-	public boolean isDestroy() {
-		return isDestroy;
 	}
 
 }

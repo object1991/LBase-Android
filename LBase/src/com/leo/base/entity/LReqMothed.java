@@ -1,5 +1,4 @@
-package com.leo.base.net;
-
+package com.leo.base.entity;
 
 /**
  * 

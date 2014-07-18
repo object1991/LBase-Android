@@ -9,6 +9,7 @@ import android.os.Parcelable;
 /**
  * 
  * @author Chen Lei
+ * @version 1.3.1
  *
  */
 @SuppressWarnings("unchecked")

@@ -1,3 +1,0 @@
-int drawable lbase_view_toast_bg 0x7f020000
-int id mytoast_tv_text 0x7f040000
-int layout lbase_view_toast 0x7f030000

@@ -3,6 +3,7 @@ package com.leo.base.exception;
 /**
  * 此类暂未正式使用
  * @author Chen Lei
+ * @version 1.1.5
  *
  */
 public interface ILException {

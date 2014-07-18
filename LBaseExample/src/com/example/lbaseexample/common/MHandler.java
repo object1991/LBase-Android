@@ -9,90 +9,87 @@ import com.leo.base.entity.LMessage;
 import com.leo.base.exception.LLoginException;
 import com.leo.base.handler.LHandler;
 import com.leo.base.net.ILNetwork.LReqResultState;
-import com.leo.base.net.LNetwork;
-import com.leo.base.net.LReqEntity;
-import com.leo.base.util.L;
 
 public abstract class MHandler extends LHandler {
 
 	public MHandler(LActivity activity) {
 		super(activity);
+		init();
 	}
 
 	public MHandler(LFragment fragment) {
 		super(fragment);
+		init();
 	}
 
 	public <T> MHandler(LBaseAdapter<T> baseAdapter) {
 		super(baseAdapter);
+		init();
+	}
+
+	/**
+	 * 初始化网络请求监听，非常重要
+	 */
+	private void init() {
+		setILNetworkListener(new MNetwork());
 	}
 
 	@Override
 	public void onException(LReqResultState state, int requestId) {
 		switch (state) {
 		case NETWORK_EXC:
-			// ... 网络请求失败
-			L.e("网络请求失败");
-			onNetWorkExc();
+			onNetWorkExc(requestId);
 			break;
 		case PARSE_EXC:
-			// ... 数据解析失败
-			L.e("数据解析失败");
-			onParseExc();
+			onParseExc(requestId);
 			break;
 		case LOGIN_ERROR:
-			// ... 自动登录错误
-			L.i("自动登录错误");
-			onLoginError();
+			onLoginError(requestId);
 			break;
 		case LOGIN_NONE:
-			// ... 没有登录帐号
-			L.i("没有登录帐号");
-			onLoginNone();
+			onLoginNone(requestId);
 			break;
-		case OTHER:
-			// ... 其它异常
-			L.e("其它异常");
-			onOtherExc();
+		case STOP:
+			onStop(requestId);
+			break;
+		default:
+			onOtherExc(requestId);
 			break;
 		}
-		onHandleUI(null, requestId);
 	}
 
 	@Override
-	public abstract LMessage onNetParse(String result, int requestId)
-			throws JSONException, LLoginException;
-
-	@Override
-	public void startLoadingData(LReqEntity entity, int requestId) {
-		LNetwork network = new MNetwork(entity, requestId);
-		network.setILNetworkCallback(this);
-		network.start();
-	}
+	public abstract LMessage onParse(String strs, int requestId)
+			throws LLoginException, JSONException, Exception;
 
 	/**
 	 * 网络请求异常
 	 */
-	protected abstract void onNetWorkExc();
+	protected abstract void onNetWorkExc(int requestId);
 
 	/**
 	 * 数据解析失败
 	 */
-	protected abstract void onParseExc();
+	protected abstract void onParseExc(int requestId);
 
 	/**
 	 * 自动登录错误
 	 */
-	protected abstract void onLoginError();
+	protected abstract void onLoginError(int requestId);
 
 	/**
 	 * 未登录用户
 	 */
-	protected abstract void onLoginNone();
+	protected abstract void onLoginNone(int requestId);
+	
+	/**
+	 * 线程停止
+	 */
+	protected abstract void onStop(int requestId);
 
 	/**
 	 * 其它异常
 	 */
-	protected abstract void onOtherExc();
+	protected abstract void onOtherExc(int requestId);
 
 }

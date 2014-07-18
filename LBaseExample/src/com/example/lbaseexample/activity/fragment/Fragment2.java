@@ -10,7 +10,7 @@ import com.example.lbaseexample.R;
 import com.example.lbaseexample.handler.FragmentHandler;
 import com.leo.base.activity.fragment.LFragment;
 import com.leo.base.entity.LMessage;
-import com.leo.base.net.LReqEntity;
+import com.leo.base.entity.LReqEntity;
 
 public class Fragment2 extends LFragment {
 
@@ -48,6 +48,6 @@ public class Fragment2 extends LFragment {
 		LReqEntity entity = new LReqEntity();
 		entity.setUrl(url);
 		entity.setUseCache(true);
-		handler.startLoadingData(entity, 0);
+		handler.start(entity, 0);
 	}
 }

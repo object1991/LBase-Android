@@ -13,28 +13,16 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context=".MainActivity" >
 
+        <Button
+            android:id="@+id/many_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="开始多个请求并发" />
+
         <TextView
-            android:id="@+id/main_infos"
+            android:id="@+id/many_infos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/main_listview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ListView示例" />
-
-        <Button
-            android:id="@+id/main_fragment_viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fragment ViewPager 示例" />
-
-        <Button
-            android:id="@+id/main_many_request"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="多个请求示例" />
     </LinearLayout>
 
 </ScrollView>

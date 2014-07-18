@@ -1,16 +1,11 @@
 package com.example.lbaseexample.common;
 
 import com.leo.base.net.LNetwork;
-import com.leo.base.net.LReqEntity;
 
 public class MNetwork extends LNetwork {
-
-	public MNetwork(LReqEntity entity, int requestId) {
-		super(entity, requestId);
-	}
-
+	
 	@Override
-	public LoginState doLogin() {
+	public LLoginState doLogin() {
 		// ... 你可以在这里操作登录
 		// ... 当你请求服务器，服务器发现你的登录信息已失效，LBase会自动调用此方法，帮助你登录
 		// ... 返回值有三种：
@@ -37,7 +32,7 @@ public class MNetwork extends LNetwork {
 		 * 如果JSON返回错误信息大于0，则认为登录失败，否则登录成功 return LoginState.ERROR; } } catch
 		 * (JSONException e) { e.printStackTrace(); return LoginState.ERROR; }
 		 */
-		return LoginState.SUCCESS;
+		return LLoginState.SUCCESS;
 	}
 
 }

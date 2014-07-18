@@ -20,7 +20,7 @@ public class MApplication extends LApplication {
 	/**
 	 * 本地数据库版本
 	 */
-	private static final int DB_VERSION = 2;
+	private static final int DB_VERSION = 3;
 
 	/**
 	 * 本地数据库创建表集合

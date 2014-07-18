@@ -1,4 +1,4 @@
-package com.leo.base.net;
+package com.leo.base.entity;
 
 import java.util.List;
 import java.util.Map;
@@ -6,10 +6,10 @@ import java.util.Map;
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
- *
+ * @version 1.3.1
+ * 
  */
-public class LReqEntity {
+public class LReqEntity implements Cloneable {
 
 	/**
 	 * 网络请求地址
@@ -24,7 +24,7 @@ public class LReqEntity {
 	/**
 	 * 需要上传的文件集合
 	 */
-	private List<LFileEntity> mFileParams;
+	private List<LReqFile> mFileParams;
 
 	/**
 	 * 网络请求模式
@@ -81,11 +81,11 @@ public class LReqEntity {
 		this.mUseCache = mUseCache;
 	}
 
-	public List<LFileEntity> getFileParams() {
+	public List<LReqFile> getFileParams() {
 		return mFileParams;
 	}
 
-	public void setFileParamsList(List<LFileEntity> list) {
+	public void setFileParamsList(List<LReqFile> list) {
 		this.mFileParams = list;
 	}
 
@@ -184,12 +184,12 @@ public class LReqEntity {
 	 *            ：编码
 	 */
 	public LReqEntity(String url, Map<String, String> params,
-			List<LFileEntity> list, LReqEncode encoding) {
+			List<LReqFile> list, LReqEncode encoding) {
 		init(url, params, list, LReqMothed.POST, encoding, false);
 	}
 
 	private void init(String url, Map<String, String> params,
-			List<LFileEntity> list, LReqMothed mode, LReqEncode encoding,
+			List<LReqFile> list, LReqMothed mode, LReqEncode encoding,
 			boolean useCache) {
 		this.mUrl = url;
 		this.mParams = params;

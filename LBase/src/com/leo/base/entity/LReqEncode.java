@@ -1,10 +1,10 @@
-package com.leo.base.net;
+package com.leo.base.entity;
 
 
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  *
  */
 public enum LReqEncode {

@@ -6,48 +6,22 @@ import java.util.Map;
 import org.json.JSONException;
 
 import android.os.AsyncTask;
-import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.leo.base.entity.LMessage;
+import com.leo.base.entity.LReqEncode;
+import com.leo.base.entity.LReqEntity;
+import com.leo.base.entity.LReqFile;
+import com.leo.base.entity.LReqMothed;
 import com.leo.base.exception.LException;
 import com.leo.base.exception.LLoginException;
 import com.leo.base.util.L;
+import com.leo.base.util.LFormat;
 
 /**
- * 网络请求工具类<br/>
- * 抽象类<br/>
- * 继承此类需重写{@link #doLogin}方法<br/>
- * 请求有三种状态{@link ReqState.PENDING}、{@link ReqState.RUNNING}、
- * {@link ReqState.FINISHED}<br/>
- * 在{@linkplain ReqState.RUNNING}（线程开始执行）状态下，不可以再打开相同的请求<br/>
- * 请求共有三个回调方法{@link onNetException}、{@link onNetResult}、 {@link onHandleUI}<br/>
- * 
- * @param {@linkplain onNetException}：
- *        <p>
- *        此回调方法有一个{@link LReqResultState}对象的参数，用于接收操作异常。 在
- *        {@link LReqResultState.NETWORK_EXC}网络连接失败、<br/>
- *        {@link LReqResultState.PARSE_EXC}数据解析失败、<br/>
- *        {@link LReqResultState.LOGIN_ERROR}用户登录失败、<br/>
- *        {@link LReqResultState.LOGIN_NONE}无登录帐号<br/>
- *        和{@link LReqResultState.OTHER}其它异常时，<br/>
- *        程序会将结果返回给此回调方法处理。<br/>
- *        此方法运行在UI线程中
- *        </p>
- * @param {@link onNetResult}：
- *        <p>
- *        此回调方法有一个{@link String}类型的参数<br/>
- *        此参数用于传递网络请求结果，用户可以使用此参数做任何操作。<br/>
- *        此方法需要用户返回一个Object类型的对象，用于在{@link onHandleUI}中传递到UI线程中<br/>
- *        此方法运行在子线程中，不可操作UI
- *        </p>
- * @param {@link onHandleUI}：
- *        <p>
- *        此回调方法有一个Object类型的参数，此参数从子线程中传递而来。<br/>
- *        用户可以在此方法中更新UI等操作
- *        </p>
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * 
  */
 public abstract class LNetwork implements ILNetwork {
@@ -58,7 +32,7 @@ public abstract class LNetwork implements ILNetwork {
 	 * @author object
 	 * 
 	 */
-	private static enum ReqState {
+	private static enum LReqState {
 
 		/**
 		 * 线程状态为等待执行
@@ -77,188 +51,248 @@ public abstract class LNetwork implements ILNetwork {
 	}
 
 	/**
-	 * 网络请求参数对象
+	 * 存放当前所有线程的集合
 	 */
-	private LReqEntity mReqEntity;
+	private SparseArray<LNetworkTask> mThreads;
 
-	/**
-	 * 请求ID
-	 */
-	private int mRequestId;
-
-	/**
-	 * 构造函数
-	 * 
-	 * @param entity
-	 *            请求参数实体
-	 */
-	public LNetwork(LReqEntity entity) {
-		this(entity, 0);
+	public LNetwork() {
+		mThreads = new SparseArray<LNetworkTask>();
 	}
 
-	/**
-	 * 构造函数
-	 * 
-	 * @param entity
-	 *            请求参数实体
-	 * @param requestId
-	 *            请求ID，用于区分不同请求
-	 */
-	public LNetwork(LReqEntity entity, int requestId) {
-		this.mReqEntity = entity;
-		this.mRequestId = requestId;
-		mThreadState = ReqState.PENDING;
-	}
-
-	/**
-	 * 请求处理接口
-	 */
-	private ILNetworkCallback mCallback;
-
-	/**
-	 * 设置请求处理回调方法
-	 * 
-	 * @param callback
-	 */
-	public void setILNetworkCallback(ILNetworkCallback callback) {
-		this.mCallback = callback;
-	}
-
-	/**
-	 * 返回结果对象
-	 */
-	private LMessage mMessage;
-
-	/**
-	 * 线程状态
-	 */
-	private static ReqState mThreadState;
-
-	/**
-	 * 开始执行网络请求
-	 */
 	@Override
-	public void start() {
-		if (mThreadState == ReqState.RUNNING) {
-			L.i("当前线程正在执行");
-			return;
-		}
-		if (this.mReqEntity == null) {
-			throw new NullPointerException("参数对象不能为空");
-		}
-		mThreadState = ReqState.RUNNING;
-		new NetworkTask().execute(mReqEntity);
+	public void start(LReqEntity reqEntity, ILNetworkCallback callback) {
+		start(reqEntity, 0, callback);
 	}
 
-	private final class NetworkTask extends
-			AsyncTask<LReqEntity, Void, LReqResultState> {
+	@Override
+	public void start(LReqEntity reqEntity, int requestId,
+			ILNetworkCallback callback) {
+		if (reqEntity == null) {
+			throw new NullPointerException(
+					"The network requests the LReqEntity parameter cannot be empty!");
+		}
+		if (callback == null) {
+			throw new NullPointerException(
+					"This is an invalid request,because you did not realize the callback interface!");
+		}
+		LNetworkTask task = mThreads.get(requestId);
+		if (task == null || task.getState() == LReqState.FINISHED) {
+			task = new LNetworkTask(reqEntity, requestId, callback);
+			task.execute();
+			mThreads.put(requestId, task);
+		} else {
+			L.i(TAG, "requestId " + requestId + " thread is running!");
+		}
+	}
+
+	@Override
+	public void stopAllThread() {
+		for (int index = 0, size = mThreads.size(); index < size; index++) {
+			int key = mThreads.keyAt(index);
+			stopThread(key);
+		}
+	}
+
+	@Override
+	public void stopThread(int requestId) {
+		LNetworkTask task = mThreads.get(requestId);
+		if (task != null) {
+			task.stop();
+		}
+	}
+
+	/**
+	 * 异步请求模块
+	 * 
+	 * @author Chen Lei
+	 * 
+	 */
+	protected final class LNetworkTask extends
+			AsyncTask<Void, Void, LReqResultState> {
+
+		/**
+		 * 请求封装实体
+		 */
+		private LReqEntity mReqEntity;
+
+		/**
+		 * 请求ID
+		 */
+		private int mRequestId;
+
+		/**
+		 * 请求回调接口
+		 */
+		private ILNetworkCallback mCallback;
+
+		/**
+		 * 请求返回值
+		 */
+		private LMessage mMessage;
+
+		/**
+		 * 线程状态
+		 */
+		private LReqState mThreadState;
+
+		/**
+		 * 是否停止线程，默认false
+		 */
+		private boolean mIsStopThread;
+
+		LNetworkTask(LReqEntity reqEntity, int reqId, ILNetworkCallback callback) {
+			this.mReqEntity = reqEntity;
+			this.mRequestId = reqId;
+			this.mCallback = callback;
+			mThreadState = LReqState.PENDING;
+			mIsStopThread = false;
+		}
 
 		@Override
-		protected LReqResultState doInBackground(LReqEntity... params) {
-			LReqEntity reqEntity = null;
-			if (params != null && params.length > 0) {
-				reqEntity = params[0];
+		protected LReqResultState doInBackground(Void... params) {
+			mThreadState = LReqState.RUNNING;
+			LReqEntity entity = mReqEntity;
+			if (entity == null) {
+				throw new NullPointerException(
+						"The network requests the LReqEntity parameter cannot be empty!");
 			}
-			if (reqEntity == null) {
-				throw new NullPointerException("参数对象不能为空");
+			String netUrl = entity.getUrl();
+			if (LFormat.isEmpty(netUrl)) {
+				throw new NullPointerException(
+						"The network requests the URL parameter cannot be empty!");
 			}
-			String url = reqEntity.getUrl();
-			if (TextUtils.isEmpty(url)) {
-				throw new NullPointerException("请求地址参数不能为空");
-			}
-			Map<String, String> param = reqEntity.getParams();
-			LReqEncode encoding = reqEntity.getReqEncode();
-			LReqMothed mothed = reqEntity.getReqMode();
-			List<LFileEntity> files = reqEntity.getFileParams();
-			String resStr = null;
+			LReqEncode netEncode = entity.getReqEncode();
+			LReqMothed netMothed = entity.getReqMode();
+			Map<String, String> netParams = entity.getParams();
+			List<LReqFile> netFiles = entity.getFileParams();
+			boolean netUseCache = entity.getUseCache();
+			if (mIsStopThread)
+				return LReqResultState.STOP;
+			String result = null;
 			try {
-				if (files != null && files.isEmpty()) {
-					resStr = LCaller.doUploadFile(url, param, files, encoding);
+				if (netFiles == null || netFiles.isEmpty()) {
+					result = LCaller.doConn(netUrl, netParams, netUseCache,
+							netMothed, netEncode);
 				} else {
-					resStr = LCaller.doConn(url, param,
-							reqEntity.getUseCache(), mothed, encoding);
+					result = LCaller.doUploadFile(netUrl, netParams, netFiles,
+							netEncode);
 				}
 			} catch (Exception e) {
-				L.e(LException.getStackMsg(e));
+				L.e(TAG, LException.getStackMsg(e));
 				return LReqResultState.NETWORK_EXC;
 			}
 			if (mCallback != null) {
+				if (mIsStopThread)
+					return LReqResultState.STOP;
 				try {
-					mMessage = mCallback.onNetResult(resStr, mRequestId);
+					mMessage = mCallback.onParse(result, mRequestId);
 				} catch (LLoginException e) {
 					mMessage = null;
 					// ... 登录处理
-					LoginState loginState = doLogin();
-					if (loginState == LoginState.SUCCESS) {
+					LLoginState loginState = doLogin();
+					if (loginState == LLoginState.SUCCESS) {
 						return LReqResultState.LOGIN_SUCCESS;
-					} else if (loginState == LoginState.ERROR) {
+					} else if (loginState == LLoginState.ERROR) {
 						return LReqResultState.LOGIN_ERROR;
-					} else if (loginState == LoginState.NONE) {
+					} else if (loginState == LLoginState.NONE) {
 						return LReqResultState.LOGIN_NONE;
 					} else {
 						return LReqResultState.LOGIN_EXC;
 					}
 				} catch (JSONException e) {
 					mMessage = null;
-					L.e(LException.getStackMsg(e));
+					L.e(TAG, LException.getStackMsg(e));
 					return LReqResultState.PARSE_EXC;
 				} catch (Exception e) {
 					mMessage = null;
-					L.e(LException.getStackMsg(e));
+					L.e(TAG, LException.getStackMsg(e));
 					return LReqResultState.OTHER;
 				}
+			} else {
+				throw new NullPointerException(
+						"This is an invalid request,because you did not realize the callback interface!");
 			}
 			return LReqResultState.SUCCESS;
 		}
 
 		@Override
 		protected void onPostExecute(LReqResultState result) {
+			if (mIsStopThread)
+				result = LReqResultState.STOP;
 			super.onPostExecute(result);
 			if (mCallback != null) {
 				switch (result) {
 				case SUCCESS:
-					mCallback.onHandleUI(mMessage, mRequestId);
+					mCallback.onHandlerUI(mMessage, mRequestId);
 					break;
 				case NETWORK_EXC:
-					mCallback.onNetException(LReqResultState.NETWORK_EXC,
+					mCallback.onException(LReqResultState.NETWORK_EXC,
 							mRequestId);
 					break;
 				case PARSE_EXC:
-					mCallback.onNetException(LReqResultState.PARSE_EXC,
-							mRequestId);
+					mCallback
+							.onException(LReqResultState.PARSE_EXC, mRequestId);
 					break;
 				case LOGIN_SUCCESS:
-					L.i("用户自动登录成功");
-					mThreadState = ReqState.FINISHED;
-					start();
+					L.i(TAG, "用户自动登录成功");
+					mThreadState = LReqState.FINISHED;
+					start(mReqEntity, mRequestId, mCallback);
 					break;
 				case LOGIN_ERROR:
-					mCallback.onNetException(LReqResultState.LOGIN_ERROR,
+					mCallback.onException(LReqResultState.LOGIN_ERROR,
 							mRequestId);
 					break;
 				case LOGIN_NONE:
-					mCallback.onNetException(LReqResultState.LOGIN_NONE,
+					mCallback.onException(LReqResultState.LOGIN_NONE,
 							mRequestId);
 					break;
 				case LOGIN_EXC:
 					throw new RuntimeException("用户登录返回异常");
 				case OTHER:
-					mCallback.onNetException(LReqResultState.OTHER, mRequestId);
+					mCallback.onException(LReqResultState.OTHER, mRequestId);
+					break;
+				case STOP:
+					L.i(TAG, "线程ID为：" + mRequestId + "的线程已停止!");
+					mCallback.onException(LReqResultState.STOP, mRequestId);
 					break;
 				default:
 					throw new IllegalArgumentException("返回结果参数错误");
 				}
-				mThreadState = ReqState.FINISHED;
+				mThreadState = LReqState.FINISHED;
 			}
 		}
 
-		@Override
-		protected void onCancelled() {
-			mReqEntity = null;
-			mMessage = null;
-			mThreadState = ReqState.FINISHED;
+		public LReqState getState() {
+			return mThreadState;
 		}
 
+		public void stop() {
+			this.mIsStopThread = true;
+		}
+
+	}
+
+	/**
+	 * 登录状态
+	 * 
+	 * @author leo
+	 * 
+	 */
+	protected enum LLoginState {
+		/**
+		 * 登录成功
+		 */
+		SUCCESS,
+
+		/**
+		 * 登录失败
+		 */
+		ERROR,
+
+		/**
+		 * 没有登录帐号
+		 */
+		NONE;
 	}
 
 	/**
@@ -268,7 +302,6 @@ public abstract class LNetwork implements ILNetwork {
 	 * 
 	 * @return {@link LoginState}结果对象
 	 */
-	@Override
-	public abstract LoginState doLogin();
+	protected abstract LLoginState doLogin();
 
 }

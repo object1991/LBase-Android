@@ -40,6 +40,8 @@ public class MainActivity extends LActivity implements OnClickListener {
 		((Button) findViewById(R.id.main_fragment_viewpager))
 				.setOnClickListener(this);
 
+		((Button) findViewById(R.id.main_many_request))
+				.setOnClickListener(this);
 	}
 
 	@Override
@@ -63,6 +65,9 @@ public class MainActivity extends LActivity implements OnClickListener {
 		case R.id.main_fragment_viewpager:
 			L.i("进入 Fragment ViewPager 示例");
 			getJumpIntent(FragmentViewPagerActivity.class);
+			break;
+		case R.id.main_many_request:
+			getJumpIntent(ManyRequestActivity.class);
 			break;
 		}
 	}

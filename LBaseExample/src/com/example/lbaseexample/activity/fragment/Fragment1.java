@@ -10,7 +10,7 @@ import com.example.lbaseexample.R;
 import com.example.lbaseexample.handler.FragmentHandler;
 import com.leo.base.activity.fragment.LFragment;
 import com.leo.base.entity.LMessage;
-import com.leo.base.net.LReqEntity;
+import com.leo.base.entity.LReqEntity;
 
 public class Fragment1 extends LFragment {
 
@@ -52,7 +52,7 @@ public class Fragment1 extends LFragment {
 	public void load() {
 		textview.setText("正在获取百度网页代码...");
 		String url = "http://www.baidu.com";
-		handler.startLoadingData(new LReqEntity(url), 0);
+		handler.start(new LReqEntity(url), 0);
 	}
 
 }

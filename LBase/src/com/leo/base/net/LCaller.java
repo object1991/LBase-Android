@@ -35,6 +35,9 @@ import android.text.TextUtils;
 import com.leo.base.application.LApplication;
 import com.leo.base.application.LConfig;
 import com.leo.base.cache.LCache;
+import com.leo.base.entity.LReqEncode;
+import com.leo.base.entity.LReqFile;
+import com.leo.base.entity.LReqMothed;
 import com.leo.base.exception.LException;
 import com.leo.base.util.L;
 import com.leo.base.util.LFormat;
@@ -43,7 +46,7 @@ import com.leo.base.util.MD5;
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
+ * @version 1.3.1
  * 
  */
 public class LCaller {
@@ -379,7 +382,7 @@ public class LCaller {
 	 * @throws IOException
 	 */
 	public static String doUploadFile(String url, Map<String, String> params,
-			List<LFileEntity> files, LReqEncode encoding) throws Exception {
+			List<LReqFile> files, LReqEncode encoding) throws Exception {
 
 		String BOUNDARY = java.util.UUID.randomUUID().toString();
 		String PREFIX = "--", LINEND = "\r\n";
@@ -422,7 +425,7 @@ public class LCaller {
 		// 发送文件数据
 		String resStr = SEND_ERROR;
 		if (files != null) {
-			for (LFileEntity file : files) {
+			for (LReqFile file : files) {
 				StringBuilder sb1 = new StringBuilder();
 				sb1.append(PREFIX);
 				sb1.append(BOUNDARY);

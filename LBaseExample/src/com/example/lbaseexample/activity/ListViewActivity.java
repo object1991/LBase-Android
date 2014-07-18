@@ -3,6 +3,8 @@ package com.example.lbaseexample.activity;
 import java.util.List;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -13,10 +15,11 @@ import com.example.lbaseexample.entity.ListEntity;
 import com.example.lbaseexample.handler.ListViewHandler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
-import com.leo.base.net.LReqEntity;
+import com.leo.base.entity.LReqEntity;
+import com.leo.base.util.L;
 import com.leo.base.util.T;
 
-public class ListViewActivity extends LActivity {
+public class ListViewActivity extends LActivity implements OnDismissListener {
 
 	private ListView mListView;
 	private ListViewAdapter adapter;
@@ -44,8 +47,21 @@ public class ListViewActivity extends LActivity {
 			sendRequest();
 			progress = new ProgressDialog(this);
 			progress.setMessage("正在加载数据...");
+			progress.setOnDismissListener(this);
 			progress.show();
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		if (handler != null) {
+			handler.stopAllThread();
+		}
+		if (progress != null) {
+			progress.dismiss();
+			progress = null;
+		}
+		super.onDestroy();
 	}
 
 	/**
@@ -53,9 +69,9 @@ public class ListViewActivity extends LActivity {
 	 */
 	private void sendRequest() {
 		// ... 网络请求地址，此URL来自于网络
-		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";	
+		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";
 		LReqEntity entity = new LReqEntity(url);
-		handler.startLoadingData(entity, 1);
+		handler.start(entity, 1);
 	}
 
 	private void setData(List<ListEntity> data) {
@@ -85,6 +101,12 @@ public class ListViewActivity extends LActivity {
 		if (progress != null && progress.isShowing()) {
 			progress.dismiss();
 		}
+	}
+
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		L.i("Activity销毁");
+		this.finish();
 	}
 
 }
