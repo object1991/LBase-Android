@@ -39,14 +39,14 @@ import com.leo.base.entity.LReqEncode;
 import com.leo.base.entity.LReqFile;
 import com.leo.base.entity.LReqMothed;
 import com.leo.base.exception.LException;
+import com.leo.base.net.LDownload.LDownloadStoppingEntity;
 import com.leo.base.util.L;
 import com.leo.base.util.LFormat;
-import com.leo.base.util.MD5;
 
 /**
  * 
  * @author Chen Lei
- * @version 1.3.1
+ * @version 1.3.5
  * 
  */
 public class LCaller {
@@ -158,8 +158,11 @@ public class LCaller {
 	 * @throws ClientProtocolException
 	 * @throws Exception
 	 */
-	private static String doPost(String url, Map<String, String> params,
+	public static String doPost(String url, Map<String, String> params,
 			boolean useCache, String encoding) throws Exception {
+		if (TextUtils.isEmpty(url)) {
+			throw new NullPointerException("网络请求地址不能为空");
+		}
 		String data = null;
 		if (useCache) {
 			data = doGetCache(url);
@@ -214,8 +217,11 @@ public class LCaller {
 	 * @throws ClientProtocolException
 	 * @throws Exception
 	 */
-	private static String doGet(String url, boolean useCache, String encoding)
+	public static String doGet(String url, boolean useCache, String encoding)
 			throws Exception {
+		if (TextUtils.isEmpty(url)) {
+			throw new NullPointerException("网络请求地址不能为空");
+		}
 		String data = null;
 		if (useCache) {
 			data = doGetCache(url);
@@ -256,94 +262,64 @@ public class LCaller {
 	}
 
 	/**
-	 * 通过InputStream获得UTF-8格式的String
+	 * 从网络上下载文件
 	 * 
-	 * @param stream
-	 * @return
-	 * @throws IOException
-	 * @throws Exception
-	 */
-	public static String convertStreamToString(final InputStream stream)
-			throws Exception {
-		return convertStreamToString(stream, LReqEncode.UTF8.getEncode());
-	}
-
-	/**
-	 * 通过InputStream获得charsetName格式的String
-	 * 
-	 * @param inSream
-	 * @param charsetName
-	 *            指定格式
-	 * @return
-	 * @throws IOException
-	 * @throws Exception
-	 */
-	public static String convertStreamToString(InputStream inSream,
-			String charsetName) throws Exception {
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		int len = -1;
-		while ((len = inSream.read(buffer)) != -1) {
-			outStream.write(buffer, 0, len);
-		}
-		byte[] data = outStream.toByteArray();
-		outStream.close();
-		inSream.close();
-		return new String(data, charsetName);
-	}
-
-	/**
-	 * 获取网络图片， 如果图片存在于缓存中， 就返回该图片， 否则从网络中加载该图片并缓存起来
-	 * 
-	 * @param path
-	 *            图片路径
-	 * @param cacheDir
+	 * @param url
+	 *            下载路径
 	 * @return
 	 */
-	public static String getImage(String path, File cacheDir) {
-		File localFile = new File(cacheDir, LFormat.getMD5Url(path));
-		if (!cacheDir.exists())
-			cacheDir.mkdirs();
-		boolean downFile = true;
-		if (!localFile.exists()) {
-			downFile = getNetDownFile(path, localFile);
-		}
-		if (downFile) {
-			return localFile.getPath();
-		} else {
-			return null;
-		}
+	public static String doDownloadFile(String url, String savePath,
+			String saveName) throws Exception {
+		return doDownloadFile(url, savePath, saveName, null, null);
 	}
 
 	/**
 	 * 从网络上下载文件
 	 * 
-	 * @param path
-	 *            ：下载路径
-	 * @param localFile
-	 *            ：本地路径
-	 * @return 下载成功：true---下载失败：false
+	 * @param url
+	 *            下载路径
+	 * @param progress
+	 *            下载进度接口
+	 * @return
 	 */
-	public static boolean getNetDownFile(String path, File localFile) {
+	public static String doDownloadFile(String url, String savePath,
+			String saveName, ILNetworkProgress progress,
+			LDownloadStoppingEntity isStopping) throws Exception {
+		if (TextUtils.isEmpty(url)) {
+			throw new NullPointerException("网络请求地址不能为空");
+		}
+		File filePath = new File(savePath);
+		if (!filePath.exists()) {
+			filePath.mkdirs();
+		}
+		File res = new File(filePath, saveName);
 		InputStream inputStream = null;
 		FileOutputStream outStream = null;
+		int count = 0;
+		int current = 0;
 		try {
-			HttpURLConnection conn = (HttpURLConnection) new URL(path)
+			HttpURLConnection conn = (HttpURLConnection) new URL(url)
 					.openConnection();
-			conn.setConnectTimeout(25000);
+			conn.setConnectTimeout(LConfig.REQUEST_TIMEOUT);
 			conn.setRequestMethod("GET");
 			if (conn.getResponseCode() == 200) {
-				outStream = new FileOutputStream(localFile);
+				count = conn.getContentLength();
+				refreshProgress(progress, count, 0);
+				outStream = new FileOutputStream(res);
 				inputStream = conn.getInputStream();
 				byte[] buffer = new byte[1024];
 				int len = 0;
-				while ((len = inputStream.read(buffer)) != -1) {
+				while ((len = inputStream.read(buffer)) != -1
+						&& !isStopping.isStopping) {
 					outStream.write(buffer, 0, len);
+					current += len;
+					refreshProgress(progress, count, current);
 				}
 			}
 		} catch (Exception e) {
 			L.e(LException.getStackMsg(e));
 		} finally {
+			refreshProgress(progress, count, count);
 			try {
 				if (inputStream != null)
 					inputStream.close();
@@ -359,17 +335,22 @@ public class LCaller {
 				L.e(LException.getStackMsg(e2));
 			}
 		}
-		return localFile.exists() ? true : false;
+		return res.getPath();
 	}
 
 	/**
-	 * 将url转成MD5
+	 * 通过拼接的方式构造请求内容，实现参数传输以及文件传输
 	 * 
 	 * @param url
+	 * @param params
+	 * @param files
+	 * @param encoding
 	 * @return
+	 * @throws Exception
 	 */
-	public static String getMD5Url(String url) {
-		return MD5.getMD5(url);
+	public static String doUploadFile(String url, Map<String, String> params,
+			List<LReqFile> files, LReqEncode encoding) throws Exception {
+		return doUploadFile(url, params, files, encoding, null);
 	}
 
 	/**
@@ -382,8 +363,11 @@ public class LCaller {
 	 * @throws IOException
 	 */
 	public static String doUploadFile(String url, Map<String, String> params,
-			List<LReqFile> files, LReqEncode encoding) throws Exception {
-
+			List<LReqFile> files, LReqEncode encoding,
+			ILNetworkProgress progress) throws Exception {
+		if (TextUtils.isEmpty(url)) {
+			throw new NullPointerException("网络请求地址不能为空");
+		}
 		String BOUNDARY = java.util.UUID.randomUUID().toString();
 		String PREFIX = "--", LINEND = "\r\n";
 		String MULTIPART_FROM_DATA = "multipart/form-data";
@@ -425,55 +409,141 @@ public class LCaller {
 		// 发送文件数据
 		String resStr = SEND_ERROR;
 		if (files != null) {
-			for (LReqFile file : files) {
-				StringBuilder sb1 = new StringBuilder();
-				sb1.append(PREFIX);
-				sb1.append(BOUNDARY);
-				sb1.append(LINEND);
-				sb1.append("Content-Disposition: form-data; name=\"file\"; filename=\""
-						+ file.getName() + "\"" + LINEND);
-				sb1.append("Content-Type: " + file.getType().getType()
-						+ "; charset=" + CHARSET + LINEND);
-				sb1.append(LINEND);
-				outStream.write(sb1.toString().getBytes());
+			int filesLength = 0;
+			try {
+				for (LReqFile file : files) {
+					filesLength += file.getLength();
+				}
+				int current = 0;
+				refreshProgress(progress, filesLength, current);
+				for (LReqFile file : files) {
+					StringBuilder sb1 = new StringBuilder();
+					sb1.append(PREFIX);
+					sb1.append(BOUNDARY);
+					sb1.append(LINEND);
+					sb1.append("Content-Disposition: form-data; name=\"file\"; filename=\""
+							+ file.getName() + "\"" + LINEND);
+					sb1.append("Content-Type: " + file.getType().getType()
+							+ "; charset=" + CHARSET + LINEND);
+					sb1.append(LINEND);
+					outStream.write(sb1.toString().getBytes());
 
-				InputStream is = new FileInputStream(file.getFile());
-				byte[] buffer = new byte[1024];
-				int len = 0;
-				while ((len = is.read(buffer)) != -1) {
-					outStream.write(buffer, 0, len);
+					InputStream is = null;
+					try {
+						is = new FileInputStream(file.getFile());
+						byte[] buffer = new byte[1024];
+						int len = 0;
+						while ((len = is.read(buffer)) != -1) {
+							outStream.write(buffer, 0, len);
+							current += len;
+							refreshProgress(progress, filesLength, current);
+						}
+					} catch (Exception e) {
+						L.e(LException.getStackMsg(e));
+					} finally {
+						if (is != null) {
+							is.close();
+							is = null;
+						}
+					}
+
+					outStream.write(LINEND.getBytes());
 				}
 
-				is.close();
-				outStream.write(LINEND.getBytes());
-			}
-
-			// 请求结束标志
-			byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
-			outStream.write(end_data);
-			outStream.flush();
-			// 得到响应码
-			int res = conn.getResponseCode();
-			if (res == 200) {
-				in = conn.getInputStream();
-				int ch;
-				StringBuilder sb2 = new StringBuilder();
-				while ((ch = in.read()) != -1) {
-					sb2.append((char) ch);
-				}
-				String data = sb2.toString();
-				if (TextUtils.isEmpty(data)) {
+				// 请求结束标志
+				byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND)
+						.getBytes();
+				outStream.write(end_data);
+				outStream.flush();
+				// 得到响应码
+				int res = conn.getResponseCode();
+				if (res == 200) {
+					in = conn.getInputStream();
+					int ch;
+					StringBuilder sb2 = new StringBuilder();
+					while ((ch = in.read()) != -1) {
+						sb2.append((char) ch);
+					}
+					String data = sb2.toString();
+					if (TextUtils.isEmpty(data)) {
+						throw new ConnectException(RUNTIME_EXCEPTION);
+					}
+					resStr = LFormat.JSONTokener(data);
+				} else {
 					throw new ConnectException(RUNTIME_EXCEPTION);
 				}
-				resStr = LFormat.JSONTokener(data);
-			} else {
-				throw new ConnectException(RUNTIME_EXCEPTION);
+			} catch (Exception e) {
+				L.e(LException.getStackMsg(e));
+			} finally {
+				refreshProgress(progress, filesLength, filesLength);
+				if (in != null) {
+					in.close();
+					in = null;
+				}
+				if (outStream != null) {
+					outStream.close();
+					outStream = null;
+				}
+				if (conn != null) {
+					conn.disconnect();
+				}
 			}
-			outStream.close();
-			conn.disconnect();
 		} else {
 			throw new NullPointerException("需要上传的文件集合不能为空");
 		}
 		return resStr;
 	}
+
+	/**
+	 * 刷新进度
+	 * 
+	 * @param progress
+	 * @param state
+	 * @param size
+	 * @param current
+	 */
+	private static void refreshProgress(ILNetworkProgress progress, int count,
+			int current) {
+		if (progress != null) {
+			progress.sendProgress(count, current);
+		}
+	}
+
+	/**
+	 * 通过InputStream获得UTF-8格式的String
+	 * 
+	 * @param stream
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public static String convertStreamToString(final InputStream stream)
+			throws Exception {
+		return convertStreamToString(stream, LReqEncode.UTF8.getEncode());
+	}
+
+	/**
+	 * 通过InputStream获得charsetName格式的String
+	 * 
+	 * @param inSream
+	 * @param charsetName
+	 *            指定格式
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public static String convertStreamToString(InputStream inSream,
+			String charsetName) throws Exception {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int len = -1;
+		while ((len = inSream.read(buffer)) != -1) {
+			outStream.write(buffer, 0, len);
+		}
+		byte[] data = outStream.toByteArray();
+		outStream.close();
+		inSream.close();
+		return new String(data, charsetName);
+	}
+
 }

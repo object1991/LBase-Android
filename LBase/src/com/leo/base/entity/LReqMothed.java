@@ -4,10 +4,10 @@ package com.leo.base.entity;
  * 
  * @author Chen Lei
  * @version 1.1.5
- *
+ * 
  */
 public enum LReqMothed {
-	
+
 	/**
 	 * 使用POST方式请求网络连接
 	 */
@@ -16,7 +16,17 @@ public enum LReqMothed {
 	/**
 	 * 使用GET方式请求网络连接
 	 */
-	GET("GET");
+	GET("GET"),
+
+	/**
+	 * 下载文件
+	 */
+	DOWNLOAD("DOWNLOAD"),
+
+	/**
+	 * 上传文件
+	 */
+	UPLOAD("UPLOAD");
 
 	private String mMothed;
 
@@ -32,5 +42,5 @@ public enum LReqMothed {
 	public String getMothed() {
 		return this.mMothed;
 	}
-	
+
 }

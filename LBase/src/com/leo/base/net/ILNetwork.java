@@ -5,22 +5,12 @@ import com.leo.base.entity.LReqEntity;
 /**
  * 
  * @author Chen Lei
- * @version 1.3.1
+ * @version 1.3.5
  * 
  */
 public interface ILNetwork {
 
 	static final String TAG = ILNetwork.class.getSimpleName();
-
-	/**
-	 * 开始执行网络请求
-	 * 
-	 * @param reqEntity
-	 *            请求封装实体
-	 * @param callback
-	 *            执行回调接口
-	 */
-	void start(LReqEntity reqEntity, ILNetworkCallback callback);
 
 	/**
 	 * 开始执行网络请求
@@ -35,18 +25,66 @@ public interface ILNetwork {
 	 * @param callback
 	 *            执行回调接口
 	 */
-	void start(LReqEntity reqEntity, int requestId, ILNetworkCallback callback);
-	
+	void request(LReqEntity reqEntity, int requestId, ILNetworkCallback callback);
+
 	/**
 	 * 停止当前对象所有线程
 	 */
 	void stopAllThread();
-	
+
 	/**
-	 * 根据请求ID停止相对应的线程
+	 * 根据请求ID停止相对应的请求线程
+	 * 
 	 * @param requestId
 	 */
-	void stopThread(int requestId);
+	void stopRequestThread(int requestId);
+	
+	/**
+	 * 根据请求ID停止相对应的下载线程
+	 * @param requestId
+	 */
+	void stopDownloadThread(int requestId);
+	
+	/**
+	 * 执行下载文件请求
+	 * @param url
+	 * @param savePath
+	 * @param saveName
+	 * @param callback
+	 */
+	void download(String url, String savePath, String saveName, int id, ILNetworkCallback callback);
+
+	/**
+	 * 登录状态
+	 * 
+	 * @author leo
+	 * 
+	 */
+	enum LLoginState {
+		/**
+		 * 登录成功
+		 */
+		SUCCESS,
+
+		/**
+		 * 登录失败
+		 */
+		ERROR,
+
+		/**
+		 * 没有登录帐号
+		 */
+		NONE;
+	}
+
+	/**
+	 * 此方法用于执行用户登录操作<br/>
+	 * 在请求网络时，由于SESSION可能为空，导致无法获取数据<br/>
+	 * 这时便需要在后台做登录操作
+	 * 
+	 * @return {@link LoginState}结果对象
+	 */
+	LLoginState doLogin();
 
 	/**
 	 * 请求返回结果状态
@@ -95,7 +133,7 @@ public interface ILNetwork {
 		 * 其它异常
 		 */
 		OTHER,
-		
+
 		/**
 		 * 线程停止
 		 */

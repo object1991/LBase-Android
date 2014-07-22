@@ -31,7 +31,7 @@ public abstract class MHandler extends LHandler {
 	 * 初始化网络请求监听，非常重要
 	 */
 	private void init() {
-		setILNetworkListener(new MNetwork());
+		initNetwork(new MNetwork());
 	}
 
 	@Override
@@ -62,6 +62,11 @@ public abstract class MHandler extends LHandler {
 	public abstract LMessage onParse(String strs, int requestId)
 			throws LLoginException, JSONException, Exception;
 
+	@Override
+	public void onProgress(int size, int current, int requestId) {
+		// ... 如果在上传文件/下载文件时需要进度控制，请重写此方法
+	}
+
 	/**
 	 * 网络请求异常
 	 */
@@ -81,7 +86,7 @@ public abstract class MHandler extends LHandler {
 	 * 未登录用户
 	 */
 	protected abstract void onLoginNone(int requestId);
-	
+
 	/**
 	 * 线程停止
 	 */

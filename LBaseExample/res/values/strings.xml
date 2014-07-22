@@ -6,6 +6,7 @@
     <string name="app_listview">ListViewExample</string>
     <string name="app_about">About Me</string>
     <string name="app_many_request">多个请求并发</string>
+    <string name="app_download">下载文件</string>
     <string name="app_fragmentviewpager">FragmentViewPagerExample</string>
     <string name="action_settings">Settings</string>
 

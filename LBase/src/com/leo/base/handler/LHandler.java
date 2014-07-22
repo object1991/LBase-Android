@@ -7,15 +7,17 @@ import android.os.Handler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.activity.fragment.LFragment;
 import com.leo.base.adapter.LBaseAdapter;
+import com.leo.base.application.LApplication;
 import com.leo.base.entity.LMessage;
 import com.leo.base.entity.LReqEntity;
 import com.leo.base.net.ILNetwork;
 import com.leo.base.net.ILNetworkCallback;
+import com.leo.base.util.LFormat;
 
 /**
  * 
  * @author Chen Lei
- * @version 1.3.1
+ * @version 1.3.5
  * 
  */
 public abstract class LHandler extends Handler implements ILNetworkCallback {
@@ -109,12 +111,17 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	}
 
 	/**
-	 * 设置网络请求监听
+	 * 初始化网络请求监听
 	 * 
 	 * @param network
 	 */
-	public void setILNetworkListener(ILNetwork network) {
+	public void initNetwork(ILNetwork network) {
 		mNetworkListener = network;
+		if (mNetworkListener != null) {
+		} else {
+			throw new NullPointerException(
+					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
+		}
 	}
 
 	/**
@@ -141,8 +148,8 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * @param entity
 	 *            ：网络请求所需要的参数对象
 	 */
-	public void start(LReqEntity entity) {
-		start(entity, 0);
+	public void request(LReqEntity entity) {
+		request(entity, 0);
 	}
 
 	/**
@@ -153,9 +160,9 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * @param requestId
 	 *            : 请求ID，方便区分不同请求
 	 */
-	public void start(LReqEntity entity, int requestId) {
+	public void request(LReqEntity entity, int requestId) {
 		if (mNetworkListener != null) {
-			mNetworkListener.start(entity, requestId, this);
+			mNetworkListener.request(entity, requestId, this);
 		} else {
 			throw new NullPointerException(
 					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
@@ -168,9 +175,6 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	public void stopAllThread() {
 		if (mNetworkListener != null) {
 			mNetworkListener.stopAllThread();
-		} else {
-			throw new NullPointerException(
-					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");
 		}
 	}
 
@@ -179,9 +183,38 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * 
 	 * @param requestId
 	 */
-	public void stopThread(int requestId) {
+	public void stopRequestThread(int requestId) {
 		if (mNetworkListener != null) {
-			mNetworkListener.stopThread(requestId);
+			mNetworkListener.stopRequestThread(requestId);
+		}
+	}
+
+	public void stopDownloadThread(int requestId) {
+		if (mNetworkListener != null) {
+			mNetworkListener.stopDownloadThread(requestId);
+		}
+	}
+
+	/**
+	 * 下载文件
+	 * 
+	 * @param url
+	 * @param savePath
+	 * @param saveName
+	 */
+	public void download(String url, String savePath, String saveName,
+			int requestId) {
+		if (LFormat.isEmpty(url)) {
+			throw new IllegalArgumentException("The URL cannot be empty!");
+		}
+		if (LFormat.isEmpty(savePath)) {
+			savePath = LApplication.getInstance().getCacheFile().getPath();
+		}
+		if (LFormat.isEmpty(saveName)) {
+			saveName = LFormat.getMD5Url(url);
+		}
+		if (mNetworkListener != null) {
+			mNetworkListener.download(url, savePath, saveName, requestId, this);
 		} else {
 			throw new NullPointerException(
 					"The LNetwork is null, you must changed setLNetworkListener(LNetwork)");

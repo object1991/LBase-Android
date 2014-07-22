@@ -3,8 +3,6 @@ package com.example.lbaseexample.activity;
 import java.util.List;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -16,10 +14,9 @@ import com.example.lbaseexample.handler.ListViewHandler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
 import com.leo.base.entity.LReqEntity;
-import com.leo.base.util.L;
 import com.leo.base.util.T;
 
-public class ListViewActivity extends LActivity implements OnDismissListener {
+public class ListViewActivity extends LActivity {
 
 	private ListView mListView;
 	private ListViewAdapter adapter;
@@ -47,7 +44,6 @@ public class ListViewActivity extends LActivity implements OnDismissListener {
 			sendRequest();
 			progress = new ProgressDialog(this);
 			progress.setMessage("正在加载数据...");
-			progress.setOnDismissListener(this);
 			progress.show();
 		}
 	}
@@ -71,7 +67,7 @@ public class ListViewActivity extends LActivity implements OnDismissListener {
 		// ... 网络请求地址，此URL来自于网络
 		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";
 		LReqEntity entity = new LReqEntity(url);
-		handler.start(entity, 1);
+		handler.request(entity, 1);
 	}
 
 	private void setData(List<ListEntity> data) {
@@ -101,12 +97,6 @@ public class ListViewActivity extends LActivity implements OnDismissListener {
 		if (progress != null && progress.isShowing()) {
 			progress.dismiss();
 		}
-	}
-
-	@Override
-	public void onDismiss(DialogInterface dialog) {
-		L.i("Activity销毁");
-		this.finish();
 	}
 
 }

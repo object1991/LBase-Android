@@ -9,7 +9,7 @@ import com.leo.base.net.ILNetwork.LReqResultState;
 /**
  * 
  * @author Chen Lei
- * @version 1.3.1
+ * @version 1.3.5
  * 
  */
 public interface ILNetworkCallback {
@@ -51,5 +51,12 @@ public interface ILNetworkCallback {
 	 *            ：请求ID
 	 */
 	void onHandlerUI(LMessage msg, int requestId);
-
+	
+	/**
+	 * 进度控制
+	 * @param count 总长度
+	 * @param current 当前长度
+	 */
+	void onProgress(int count, int current, int requestId);
+	
 }

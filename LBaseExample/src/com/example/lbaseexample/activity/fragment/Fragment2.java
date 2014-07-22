@@ -48,6 +48,6 @@ public class Fragment2 extends LFragment {
 		LReqEntity entity = new LReqEntity();
 		entity.setUrl(url);
 		entity.setUseCache(true);
-		handler.start(entity, 0);
+		handler.request(entity, 0);
 	}
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.lbaseexample"
-    android:versionCode="131"
-    android:versionName="1.3.1" >
+    android:versionCode="135"
+    android:versionName="1.3.5" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -46,6 +46,11 @@
         <activity
             android:name="com.example.lbaseexample.activity.ManyRequestActivity"
             android:label="@string/app_many_request"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.lbaseexample.activity.DownloadActivity"
+            android:label="@string/app_download"
             android:screenOrientation="portrait" >
         </activity>
     </application>

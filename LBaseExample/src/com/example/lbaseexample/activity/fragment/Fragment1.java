@@ -52,7 +52,7 @@ public class Fragment1 extends LFragment {
 	public void load() {
 		textview.setText("正在获取百度网页代码...");
 		String url = "http://www.baidu.com";
-		handler.start(new LReqEntity(url), 0);
+		handler.request(new LReqEntity(url), 0);
 	}
 
 }

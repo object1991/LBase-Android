@@ -42,6 +42,8 @@ public class MainActivity extends LActivity implements OnClickListener {
 
 		((Button) findViewById(R.id.main_many_request))
 				.setOnClickListener(this);
+
+		((Button) findViewById(R.id.main_download)).setOnClickListener(this);
 	}
 
 	@Override
@@ -68,6 +70,9 @@ public class MainActivity extends LActivity implements OnClickListener {
 			break;
 		case R.id.main_many_request:
 			getJumpIntent(ManyRequestActivity.class);
+			break;
+		case R.id.main_download:
+			getJumpIntent(DownloadActivity.class);
 			break;
 		}
 	}

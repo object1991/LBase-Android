@@ -74,11 +74,12 @@ public class ManyRequestActivity extends LActivity implements OnClickListener {
 		}
 		sb = new StringBuilder();
 		for (int i = 0; i < requestCount; i++) {
-			requestNetwork.start(requestEntity, i, new ILNetworkCallback() {
+			requestNetwork.request(requestEntity, i, new ILNetworkCallback() {
 
 				@Override
 				public LMessage onParse(String strs, int requestId)
 						throws LLoginException, JSONException, Exception {
+					// ... 运行在子线程
 					LMessage msg = new LMessage();
 					msg.setStr(strs);
 					return msg;
@@ -86,6 +87,7 @@ public class ManyRequestActivity extends LActivity implements OnClickListener {
 
 				@Override
 				public void onHandlerUI(LMessage msg, int requestId) {
+					// ... 运行在UI线程
 					sb.append("请求requestId为：").append(requestId)
 							.append("的请求，成功！\n");
 					textview.setText(sb.toString());
@@ -93,6 +95,7 @@ public class ManyRequestActivity extends LActivity implements OnClickListener {
 
 				@Override
 				public void onException(LReqResultState state, int requestId) {
+					// ... 运行在UI线程
 					if (state == LReqResultState.STOP) {
 						sb.append("请求requestId为：").append(requestId)
 								.append("的请求，被停止！\n");
@@ -102,7 +105,20 @@ public class ManyRequestActivity extends LActivity implements OnClickListener {
 					}
 					textview.setText(sb.toString());
 				}
+
+				@Override
+				public void onProgress(int count, int current, int requestId) {
+					// ... 上传文件时，在此处可以回调进度
+				}
 			});
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (requestNetwork != null) {
+			requestNetwork.stopAllThread();
 		}
 	}
 

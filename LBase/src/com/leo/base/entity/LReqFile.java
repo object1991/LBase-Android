@@ -6,7 +6,7 @@ import java.io.File;
  * 
  * @author Chen Lei
  * @version 1.3.1
- *
+ * 
  */
 public class LReqFile {
 
@@ -42,6 +42,13 @@ public class LReqFile {
 
 	public void setType(LReqFileType type) {
 		this.type = type;
+	}
+
+	public long getLength() {
+		if (file.isFile() && file.exists()) {
+			return file.length();
+		}
+		return 0;
 	}
 
 	@Override
