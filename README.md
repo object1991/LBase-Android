@@ -39,7 +39,6 @@
 
 * 请下载 LBaseExample 查看
 * PS：LBase-Android 完全支持 Cookie 维护，对于后台未登录情况，只需要在 onParse 方法中 throw new LLoginException(); 即可，框架会自动完成登录并重新发起请求
-* 
 
 # 关于作者
 
