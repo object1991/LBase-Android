@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.leo.base.application.LApplication;
+import com.leo.base.dialog.LProgress;
+import com.leo.base.dialog.LProgress.OnKeyBackListener;
 import com.leo.base.entity.LMessage;
 import com.leo.base.handler.ILHandlerCallback;
 
@@ -32,7 +34,7 @@ import com.leo.base.handler.ILHandlerCallback;
  * 
  */
 public abstract class LActivity extends FragmentActivity implements
-		ILHandlerCallback {
+		ILHandlerCallback, OnKeyBackListener {
 
 	/**
 	 * 全局的上下文对象
@@ -43,6 +45,11 @@ public abstract class LActivity extends FragmentActivity implements
 	 * 全局的 {@linkplain com.leo.base.application.LApplication LApplication} 对象
 	 */
 	public LApplication mLApplication;
+
+	/**
+	 * 进度提示框
+	 */
+	private LProgress mProgressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +72,44 @@ public abstract class LActivity extends FragmentActivity implements
 	@Override
 	protected void onPause() {
 		super.onPause();
+		dismissProgressDialog();
+		mProgressDialog = null;
 	}
 
 	@Override
 	protected void onDestroy() {
 		mLApplication.delActivity(this);
 		super.onDestroy();
+	}
+
+	/**
+	 * 显示一个ProgressDialog，直接调用即可<br/>
+	 * 此ProgressDialog会在onPause方法内自动销毁
+	 * 
+	 * @param text
+	 *            提示文字
+	 */
+	protected void showProgressDialog(String text) {
+		if (mProgressDialog == null) {
+			mProgressDialog = new LProgress(this);
+			mProgressDialog.setOnKeyBackListener(this);
+		}
+		mProgressDialog.show(text);
+	}
+
+	/**
+	 * 销毁一个ProgressDialog
+	 */
+	protected void dismissProgressDialog() {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			mProgressDialog.dismiss();
+		}
+	}
+
+	@Override
+	public void onKeyBackListener() {
+		// ... 如果ProgressDialog正在运行，使用者按下BACK键，销毁ProgressDialog的同时，还会调用此接口。
+		// ... 使用者可以在这里finish()，也可以在这里停止线程
 	}
 
 	/**

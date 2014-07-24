@@ -29,7 +29,6 @@ public class Fragment1 extends LFragment {
 			Bundle savedInstanceState) {
 		ViewGroup mViewGroup = (ViewGroup) inflater.inflate(
 				R.layout.fragment_view1, container, false);
-		textview = (TextView) mViewGroup.findViewById(R.id.jsonstring);
 		return mViewGroup;
 	}
 
@@ -37,6 +36,7 @@ public class Fragment1 extends LFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+		textview = (TextView) getView().findViewById(R.id.jsonstring);
 		load();
 	}
 
@@ -50,8 +50,8 @@ public class Fragment1 extends LFragment {
 	}
 
 	public void load() {
-		textview.setText("正在获取百度网页代码...");
-		String url = "http://www.baidu.com";
+		textview.setText("正在获取优酷网页代码...");
+		String url = "http://www.youku.com";
 		handler.request(new LReqEntity(url), 0);
 	}
 

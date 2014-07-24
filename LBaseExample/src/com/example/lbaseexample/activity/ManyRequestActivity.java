@@ -68,7 +68,7 @@ public class ManyRequestActivity extends LActivity implements OnClickListener {
 	 */
 	private void sendRequest(int requestCount) {
 		LReqEntity requestEntity = new LReqEntity();
-		requestEntity.setUrl("http://www.youku.com");
+		requestEntity.setUrl("http://www.baidu.com");
 		if (requestNetwork == null) {
 			requestNetwork = new MNetwork();
 		}

@@ -1,10 +1,11 @@
 #LBase-Android 基础框架
 * 项目类型：Library
-* 版本 version 1.3.5
+* 版本 version 1.3.8
 
 
 ----
-#新增
+## 新增
+* ProgressDialog 进度框的使用，与LActivity、LFragment进行绑定
 * 文件下载，进度控制
 * 调整框架结构
 

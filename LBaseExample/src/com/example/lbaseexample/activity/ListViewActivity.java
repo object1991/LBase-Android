@@ -2,7 +2,6 @@ package com.example.lbaseexample.activity;
 
 import java.util.List;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -14,6 +13,7 @@ import com.example.lbaseexample.handler.ListViewHandler;
 import com.leo.base.activity.LActivity;
 import com.leo.base.entity.LMessage;
 import com.leo.base.entity.LReqEntity;
+import com.leo.base.util.L;
 import com.leo.base.util.T;
 
 public class ListViewActivity extends LActivity {
@@ -22,8 +22,6 @@ public class ListViewActivity extends LActivity {
 	private ListViewAdapter adapter;
 
 	private ListViewHandler handler;
-
-	private ProgressDialog progress;
 
 	@Override
 	protected void onLCreate(Bundle savedInstanceState) {
@@ -42,9 +40,7 @@ public class ListViewActivity extends LActivity {
 			setData(data);
 		} else {
 			sendRequest();
-			progress = new ProgressDialog(this);
-			progress.setMessage("正在加载数据...");
-			progress.show();
+			showProgressDialog("正在加载数据...");
 		}
 	}
 
@@ -52,10 +48,6 @@ public class ListViewActivity extends LActivity {
 	protected void onDestroy() {
 		if (handler != null) {
 			handler.stopAllThread();
-		}
-		if (progress != null) {
-			progress.dismiss();
-			progress = null;
 		}
 		super.onDestroy();
 	}
@@ -68,6 +60,17 @@ public class ListViewActivity extends LActivity {
 		String url = "http://www.duitang.com/album/1733789/masn/p/2/24/";
 		LReqEntity entity = new LReqEntity(url);
 		handler.request(entity, 1);
+	}
+
+	@Override
+	public void onKeyBackListener() {
+		super.onKeyBackListener();
+		L.i("停止线程！");
+		if (handler != null) {
+			handler.stopAllThread();
+		}
+		L.i("销毁Activity！");
+		this.finish();
 	}
 
 	private void setData(List<ListEntity> data) {
@@ -94,9 +97,7 @@ public class ListViewActivity extends LActivity {
 				T.ss("获取数据失败");
 			}
 		}
-		if (progress != null && progress.isShowing()) {
-			progress.dismiss();
-		}
+		dismissProgressDialog();
 	}
 
 }

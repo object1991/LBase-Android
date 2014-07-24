@@ -29,8 +29,14 @@ public class Fragment2 extends LFragment {
 			Bundle savedInstanceState) {
 		ViewGroup mViewGroup = (ViewGroup) inflater.inflate(
 				R.layout.fragment_view1, container, false);
-		textview = (TextView) mViewGroup.findViewById(R.id.jsonstring);
 		return mViewGroup;
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		textview = (TextView) getView().findViewById(R.id.jsonstring);
 	}
 
 	@Override
