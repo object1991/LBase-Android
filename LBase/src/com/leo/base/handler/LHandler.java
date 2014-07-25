@@ -12,12 +12,13 @@ import com.leo.base.entity.LMessage;
 import com.leo.base.entity.LReqEntity;
 import com.leo.base.net.ILNetwork;
 import com.leo.base.net.ILNetworkCallback;
+import com.leo.base.service.LService;
 import com.leo.base.util.LFormat;
 
 /**
  * 
  * @author Chen Lei
- * @version 1.3.5
+ * @version 1.3.9
  * 
  */
 public abstract class LHandler extends Handler implements ILNetworkCallback {
@@ -56,6 +57,11 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 	 * 当前BaseAdapter对象
 	 */
 	private LBaseAdapter<?> mBaseAdapter;
+
+	/**
+	 * 当前Service对象
+	 */
+	private LService mService;
 
 	/**
 	 * 设置LNetwork监听
@@ -105,6 +111,15 @@ public abstract class LHandler extends Handler implements ILNetworkCallback {
 		this.mBaseAdapter = mBaseAdapter;
 		try {
 			this.mILHandlerCallback = (ILHandlerCallback) mBaseAdapter;
+		} catch (ClassCastException e) {
+			this.mILHandlerCallback = null;
+		}
+	}
+
+	public LHandler(LService service) {
+		this.mService = service;
+		try {
+			this.mILHandlerCallback = (ILHandlerCallback) mService;
 		} catch (ClassCastException e) {
 			this.mILHandlerCallback = null;
 		}
