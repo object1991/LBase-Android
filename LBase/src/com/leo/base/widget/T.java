@@ -1,4 +1,4 @@
-package com.leo.base.util;
+package com.leo.base.widget;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leo.base.application.LApplication;
+import com.leo.base.util.LBitmap;
 
 /**
  * 

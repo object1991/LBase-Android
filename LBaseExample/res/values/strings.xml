@@ -9,5 +9,6 @@
     <string name="app_download">下载文件</string>
     <string name="app_fragmentviewpager">FragmentViewPagerExample</string>
     <string name="action_settings">Settings</string>
+    <string name="app_webview">WebView保持session</string>
 
 </resources>

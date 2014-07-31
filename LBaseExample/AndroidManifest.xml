@@ -53,6 +53,11 @@
             android:label="@string/app_download"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.example.lbaseexample.activity.WebViewActivity"
+            android:label="@string/app_download"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

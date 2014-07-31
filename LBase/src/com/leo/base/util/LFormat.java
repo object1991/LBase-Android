@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 /**
  * 
  * @author Chen Lei
- * @version 1.1.5
- *
+ * @version 1.4.1
+ * 
  */
 public class LFormat {
 
@@ -169,6 +169,19 @@ public class LFormat {
 	 */
 	public static String getMD5Url(String url) {
 		return MD5.getMD5(url) + url.substring(url.lastIndexOf('.'));
+	}
+
+	/**
+	 * 传入两个数字，计算比例
+	 * @param arg1
+	 * @param arg2
+	 * @return
+	 */
+	public static double getScale(double arg1, double arg2) {
+		if (arg2 == 0) {
+			throw new ArithmeticException("by arg2 is zero");
+		}
+		return arg1 / arg2;
 	}
 
 }

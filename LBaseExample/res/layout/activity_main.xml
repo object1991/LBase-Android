@@ -41,6 +41,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="下载文件请求示例" />
+        
+        <Button
+            android:id="@+id/main_webview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WebView保存session示例" />
     </LinearLayout>
 
 </ScrollView>

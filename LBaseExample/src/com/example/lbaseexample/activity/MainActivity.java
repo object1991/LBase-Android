@@ -15,7 +15,7 @@ import com.leo.base.activity.LActivity;
 import com.leo.base.util.L;
 import com.leo.base.util.LMobileInfo;
 import com.leo.base.util.LSharePreference;
-import com.leo.base.util.T;
+import com.leo.base.widget.T;
 
 public class MainActivity extends LActivity implements OnClickListener {
 
@@ -44,6 +44,8 @@ public class MainActivity extends LActivity implements OnClickListener {
 				.setOnClickListener(this);
 
 		((Button) findViewById(R.id.main_download)).setOnClickListener(this);
+
+		((Button) findViewById(R.id.main_webview)).setOnClickListener(this);
 	}
 
 	@Override
@@ -73,6 +75,9 @@ public class MainActivity extends LActivity implements OnClickListener {
 			break;
 		case R.id.main_download:
 			getJumpIntent(DownloadActivity.class);
+			break;
+		case R.id.main_webview:
+			getJumpIntent(WebViewActivity.class);
 			break;
 		}
 	}

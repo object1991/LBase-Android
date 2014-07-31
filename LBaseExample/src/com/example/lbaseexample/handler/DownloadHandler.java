@@ -11,7 +11,7 @@ import com.leo.base.exception.LLoginException;
 import com.leo.base.util.L;
 import com.leo.base.util.LBitmap;
 import com.leo.base.util.LFormat;
-import com.leo.base.util.T;
+import com.leo.base.widget.T;
 
 public class DownloadHandler extends MHandler {
 
