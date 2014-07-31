@@ -1,9 +1,10 @@
 #LBase-Android 基础框架
 * 项目类型：Library
-* 版本 version 1.3.9
+* 版本 version 1.4.1
 
 ----
 ## 新增
+* LWebView，可以自动填充网页请求的Session
 * LService
 * ProgressDialog 进度框的使用，与LActivity、LFragment进行绑定
 * 文件下载，进度控制
