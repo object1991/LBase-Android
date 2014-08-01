@@ -1,8 +1,12 @@
 #LBase-Android 基础框架
 * 项目类型：Library
-* 版本 version 1.4.1
+* 版本 version 1.4.2
 
 ----
+修复
+* ImageLoader默认图片
+
+
 ## 新增
 * LWebView，可以自动填充网页请求的Session
 * LService

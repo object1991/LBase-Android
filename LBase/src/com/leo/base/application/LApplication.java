@@ -151,11 +151,6 @@ public class LApplication extends Application {
 	private int mDefaultImageId = -1;
 
 	/**
-	 * 全局默认图片实例
-	 */
-	private Drawable mDefaultImage;
-
-	/**
 	 * 全局Session的Key值
 	 */
 	private String SessionKey = LConfig.SESSION_KEY;
@@ -209,6 +204,7 @@ public class LApplication extends Application {
 
 	/**
 	 * 删除一个Activity在数组里
+	 * 
 	 * @param activity
 	 */
 	public void delActivity(FragmentActivity activity) {
@@ -491,13 +487,13 @@ public class LApplication extends Application {
 	 */
 	public DisplayImageOptions getImageOptions(Drawable drawable) {
 		if (mOption == null) {
-			Drawable mDrawable = drawable;
-			if (mDrawable == null) {
-				mDrawable = getDefaultImage();
+			if (mDefaultImageId == -1) {
+				mDefaultImageId = android.R.drawable.ic_delete;
 			}
 			mOption = new DisplayImageOptions.Builder()
-					.showImageOnLoading(mDrawable)
-					.showImageForEmptyUri(mDrawable).showImageOnFail(mDrawable)
+					.showImageOnLoading(mDefaultImageId)
+					.showImageForEmptyUri(mDefaultImageId)
+					.showImageOnFail(mDefaultImageId)
 					.resetViewBeforeLoading(false).delayBeforeLoading(100)
 					.imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
 					.cacheInMemory(true).cacheOnDisk(true)
@@ -515,35 +511,6 @@ public class LApplication extends Application {
 	 */
 	public void setDefaultImage(int defaultImageId) {
 		this.mDefaultImageId = defaultImageId;
-		this.mDefaultImage = null;
-	}
-
-	/**
-	 * 设置默认图片
-	 * 
-	 * @param defaultImage
-	 *            ：Drawable对象
-	 */
-	public void setDefaultImage(Drawable defaultImage) {
-		this.mDefaultImage = defaultImage;
-	}
-
-	/**
-	 * 获取默认图片
-	 * 
-	 * @return
-	 */
-	public Drawable getDefaultImage() {
-		if (mDefaultImage == null) {
-			if (mDefaultImageId == -1) {
-				throw new NullPointerException("默认图片对象或ID为空");
-			}
-			mDefaultImage = getResources().getDrawable(mDefaultImageId);
-			if (mDefaultImage == null) {
-				throw new IllegalArgumentException("默认图片参数错误");
-			}
-		}
-		return mDefaultImage;
 	}
 
 	/**
